@@ -1,8 +1,8 @@
 # CS229_Project
 This is the repo for CS 229 (Machine learning), spring 2016, Stanford
 Team: 
-Hubert Teo
-Yuetong Wang
+Hubert Teo\n
+Yuetong Wang\n
 Jiren Zhu
 
 We are writing a hearthstone AI as our final class project.
