@@ -8,3 +8,8 @@ Jiren Zhu
 We are writing a hearthstone AI as our final class project.
 
 The game system we are operating on is forked from the hearthbreaker platform by danielyule and others. We appreciate the great infrastructure that they constructed which would allow us to build on easily.
+
+Notes:
+
+For the hearthbreaker simulator
+Before running the program, resize the terminal, else there would be an error.
