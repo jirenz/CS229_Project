@@ -48,11 +48,11 @@ def do_stuff():
         if _count % 1000 == 0:
             print("---- game #{} ----".format(_count))
 
-    deck1 = load_deck("mage.hsdeck")
-    deck2 = load_deck("mage2.hsdeck")
+    deck1 = load_deck("zoo.hsdeck")
+    deck2 = load_deck("zoo.hsdeck")
     game = Game([deck1, deck2], [RandomAgent(), RandomAgent()])
 
-    print(timeit.timeit(play_game, 'gc.enable()', number=100000))
+    print(timeit.timeit(play_game, 'gc.enable()', number=10))
 
 if __name__ == "__main__":
     do_stuff()
