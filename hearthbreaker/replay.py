@@ -10,6 +10,9 @@ import hearthbreaker.cards
 import hearthbreaker.proxies
 from hearthbreaker.serialization.move import Move, AttackMove, PowerMove, TurnEndMove, \
     TurnStartMove, ConcedeMove, PlayMove, GameEndMove
+
+from pprint import pprint
+
 __doc__ = """
 Responsible for reading and writing replays in either the compact or complete replay format (see the `replay format
 <https://github.com/danielyule/hearthbreaker/blob/master/replay_format.md>`_ for details).
@@ -495,6 +498,7 @@ def playback(replay):
             while move_index < len(replay._moves) and not player.hero.dead and type(
                     replay._moves[move_index]) is not hearthbreaker.serialization.move.TurnEndMove:
                 random_index = 0
+                print(replay._moves[move_index].to_output_string())
                 replay._moves[move_index].play(game)
                 move_index += 1
             if move_index == len(replay._moves):

@@ -120,6 +120,10 @@ class Bindable:
         :param list args: The arguments to pass to the bound function
         :see: :class:`Bindable`
         """
+        if not hasattr(self, 'name'):
+            self.name = ""
+            print("Noname: " + str(vars(self)))
+        print("Event: " + self.__class__.__name__ + " " + self.name + " " + event) #
         if event in self.events:
             for handler in copy.copy(self.events[event]):
                 if handler[1]:
@@ -1117,6 +1121,8 @@ class Hero(Character):
         new_hero.auras = copy.deepcopy(self.auras)
         new_hero.buffs = copy.deepcopy(self.buffs)
         new_hero.card = type(self.card)()
+
+        new_hero.name = self.name
 
         return new_hero
 

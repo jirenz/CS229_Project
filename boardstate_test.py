@@ -10,38 +10,22 @@ import sys
 
 from projectfiles.deck_loader import DeckLoader
 
-def generate_replays():
+def generate():
     loader = DeckLoader()
-    deck1 = loader.load_deck("patron.hsdeck")
-    deck2 = loader.load_deck("patron.hsdeck")
+    deck1 = loader.load_deck("zoo.hsdeck")
+    deck2 = loader.load_deck("zoo.hsdeck")
     game = Game([deck1, deck2], [RandomAgent(), RandomAgent()])
     new_game = game.copy()
-    replay = record(new_game)
+
     try:
-        new_game.start()
+        new_game.start_with_log()
     except Exception as e:
         print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
         print(new_game._all_cards_played)
         raise e
 
-    replay.write_json("replay_text.hsreplay")
     del new_game
     print("done!")
 
-def log_gamestates():
-    replay = Replay()
-    replay.read_json("replay_text.hsreplay")
-    # replay.write_json("replay_text2.hsreplay")
-    # return
-    game = playback(replay)
-    game.start()
-    print("done!")
-
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("not enough arguments provided\n")
-        sys.exit()
-    if sys.argv[1] == '-g':
-        generate_replays()
-    elif sys.argv[1] == '-l':
-        log_gamestates()
+    generate()

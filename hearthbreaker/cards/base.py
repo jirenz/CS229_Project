@@ -254,6 +254,9 @@ class MinionCard(Card, metaclass=abc.ABCMeta):
         if (len(player.minions) >= 7 and not self._placeholder) or len(player.minions) >= 8:
             raise GameException("Cannot place a minion on a board with more than 7 minons on it")
         minion = self.create_minion(player)
+
+        minion.name = self.name # added name attribute to minion
+
         minion.card = self
         minion.player = player
         minion.game = game
@@ -361,7 +364,10 @@ class HeroCard(Card, metaclass=abc.ABCMeta):
         pass
 
     def create_hero(self, player):
-        return Hero(self.health, self.character_class, self.power(), player)
+        h = Hero(self.health, self.character_class, self.power(), player)
+        # h.card = self
+        h.name = self.name
+        return h
 
 
 class SpellCard(Card, metaclass=abc.ABCMeta):
