@@ -52,7 +52,7 @@ def do_stuff():
     deck2 = load_deck("zoo.hsdeck")
     game = Game([deck1, deck2], [RandomAgent(), RandomAgent()])
 
-    print(timeit.timeit(play_game, 'gc.enable()', number=10))
+    print(timeit.timeit(play_game, 'gc.enable()', number=1001))
 
 if __name__ == "__main__":
     do_stuff()

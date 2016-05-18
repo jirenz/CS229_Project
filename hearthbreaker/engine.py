@@ -69,6 +69,7 @@ class Game(Bindable):
         self._all_cards_played = []
         self._turns_passed = 0
         self.selected_card = None
+        self.winner = None # added winner 
 
     def random_draw(self, cards, requirement):
         filtered_cards = [card for card in filter(requirement, cards)]
@@ -138,7 +139,8 @@ class Game(Bindable):
 
     def play_single_turn(self):
         self._start_turn()
-        self.current_player.agent.do_turn(self.current_player)
+        while not self.game_ended and self.current_player.agent.do_turn(self.current_player):
+            pass
         self._end_turn()
 
     def _start_turn(self):
@@ -174,7 +176,14 @@ class Game(Bindable):
         self._has_turn_ended = False
 
     def game_over(self):
+        if not self.players[0].hero.dead and not self.players[1].hero.dead:
+            raise GameException("Game ended without anyone dead")
+        if not self.players[0].hero.dead:
+            self.winner = self.players[0]
+        if not self.players[1].hero.dead:
+            self.winner = self.players[1]
         self.game_ended = True
+        self.trigger("game_ended", self.winner)
 
     def _end_turn(self):
         from hearthbreaker.tags.status import Frozen

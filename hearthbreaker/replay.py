@@ -9,7 +9,7 @@ import hearthbreaker.game_objects
 import hearthbreaker.cards
 import hearthbreaker.proxies
 from hearthbreaker.serialization.move import Move, AttackMove, PowerMove, TurnEndMove, \
-    TurnStartMove, ConcedeMove, PlayMove
+    TurnStartMove, ConcedeMove, PlayMove, GameEndMove
 __doc__ = """
 Responsible for reading and writing replays in either the compact or complete replay format (see the `replay format
 <https://github.com/danielyule/hearthbreaker/blob/master/replay_format.md>`_ for details).
@@ -84,7 +84,10 @@ class Replay:
         move if it has.
         """
         if len(self._moves) > 0:
-            self._moves[-1].random_numbers.append(result)
+            if self._moves[-1].__class__.__name__ != 'GameEndMove':
+                self._moves[-1].random_numbers.append(result)
+            else:
+                self._moves[-2].random_numbers.append(result)
         else:
             self.random.append(result)
 
@@ -139,6 +142,12 @@ class Replay:
             if card_index[index]:
                 k_arr.append(index)
         self.keeps.append(k_arr)
+
+    def _record_game_end(self, winner):
+        """
+        Record the end of the game
+        """
+        self._moves.append(GameEndMove(winner))
 
     def __shorten_deck(self, cards):
         """
@@ -352,6 +361,8 @@ class Replay:
 
             elif move == 'concede':
                 self._moves.append(ConcedeMove())
+            elif move == 'game_end':
+                pass # currently we are not putting in game end because it will end anyways
         if was_filename:
             file.close()
         if len(self.keeps) is 0:
@@ -410,6 +421,7 @@ def record(game):
         replay._save_decks(game.players[1].deck, game.players[0].deck)
 
     game.bind("kept_cards", replay._record_kept_index)
+    game.bind("game_ended", replay._record_game_end)
 
     for player in game.players:
         player.bind("used_power", replay._record_power)

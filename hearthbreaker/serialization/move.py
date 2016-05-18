@@ -26,6 +26,8 @@ class Move:
             cls = TurnStartMove
         elif name == 'concede':
             cls = ConcedeMove
+        elif name == 'game_end':
+            cls = GameEndMove
 
         obj = cls.__new__(cls)
         cls.__from_json__(obj, **json)
@@ -233,6 +235,28 @@ class ConcedeMove(Move):
     def __to_json__(self):
         return self.__update_json__({
             'name': 'concede',
+        })
+
+    def __from_json__(self):
+        pass
+
+class GameEndMove(Move):
+    def __init__(self, winner = None):
+        super().__init__()
+        self.winner = None
+        if winner:
+            self.winner = winner.name
+
+    def to_output_string(self):
+        return "game_end()"
+
+    def play(self, game):
+        game.game_end = true
+
+    def __to_json__(self):
+        return self.__update_json__({
+            'name': 'game_end',
+            'winner': self.winner
         })
 
     def __from_json__(self):

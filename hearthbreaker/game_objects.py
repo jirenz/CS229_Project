@@ -1142,7 +1142,7 @@ class Hero(Character):
 
     def die(self, by):
         super().die(by)
-        self.player.game.game_over()
+        self.player.game.game_over() # !!! That is how someone dies
 
     def find_power_target(self):
         targets = hearthbreaker.targeting.find_spell_target(self.player.game, lambda t: t.spell_targetable())
