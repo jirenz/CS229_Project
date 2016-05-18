@@ -243,7 +243,7 @@ class ConcedeMove(Move):
 class GameEndMove(Move):
     def __init__(self, winner = None):
         super().__init__()
-        self.winner = None
+        self.winner = ""
         if winner:
             self.winner = winner.name
 
@@ -259,5 +259,9 @@ class GameEndMove(Move):
             'winner': self.winner
         })
 
-    def __from_json__(self):
-        pass
+    def __from_json__(self, winner):
+        if winner == "":
+            self.winner = None
+        else:
+            self.winner = winner
+        

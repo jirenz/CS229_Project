@@ -59,7 +59,8 @@
           {"title": "Power",   "$ref": "#/definitions/power"},
           {"title": "Start",   "$ref": "#/definitions/start"},
           {"title": "End",     "$ref": "#/definitions/end"},
-          {"title": "Concede", "$ref": "#/definitions/concede"}
+          {"title": "Concede", "$ref": "#/definitions/concede"},
+          {"title": "GameEnd", "$ref": "#/definitions/game_end"}
         ]
       },
       "additionalItems": false
@@ -221,6 +222,21 @@
         }
       },
       "required": ["player"]
+    },
+    "game_end": {
+      "title": "GameEnd",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^game_end$"
+        },
+        "winner": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["name", "winner"]
     }
 
   }
