@@ -1,5 +1,3 @@
-# You are a ball
-
 from hearthbreaker.agents.basic_agents import DoNothingAgent
 from hearthbreaker.agents.trade.possible_play import PlayMixin
 from hearthbreaker.agents.trade.trade import TradeMixin, AttackMixin
