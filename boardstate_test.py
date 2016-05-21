@@ -17,6 +17,7 @@ class Hearthlogger:
         self.game = None
         self.states = []
         self.winner = None
+        self.games = []
 
     def attach(self, game):
         game.tracking = True
@@ -25,6 +26,7 @@ class Hearthlogger:
 
     def log(self, json_str):
         self.states.append(json_str)
+        salf.games.append(game.copy)
 
     def save(self, file_name = "default_log"):
         file_name += ".hslog"
@@ -37,6 +39,8 @@ class Hearthlogger:
         text_file.close()
         print("Saved to " + file_name + '.\n')
 
+    def shelf:
+        pass
 
 def generate_one(filename):
     loader = DeckLoader()
@@ -52,12 +56,15 @@ def generate_one(filename):
     try:
         new_game.start()
     except Exception as e:
-       print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
-       print(new_game._all_cards_played)
+       # print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
+       # print(new_game._all_cards_played)
+       del new_game
+       del game_log
        return False
     # print("winning agent: " + new_game.winner.agent.__class__.__name__)
     game_log.save(filename)
     del new_game
+    del game_log
     return True
 
 def generate_number(folder_name, number, prefix):
