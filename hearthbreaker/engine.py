@@ -20,7 +20,7 @@ def __create_card_table():
             c = sc()
             card_table[c.ref_name] = sc
 
-    for card_class in [WeaponCard, SpellCard, MinionCard, SecretCard, ChoiceCard, HeroCard]:
+    for card_class in [WeaponCard, SecretCard, SpellCard, MinionCard, ChoiceCard, HeroCard]: #
         __card_lookup_rec(card_class)
 
 
@@ -41,10 +41,11 @@ def card_lookup(card_name):
 
 
 def get_cards():
-    card_list = filter(lambda c: c.collectible,
-                       [card() for card in card_table.values()])
+    card_list = filter(lambda c: c.collectible, [card() for card in card_table.values()])
     return card_list
 
+def get_all_cards():
+    return card_table
 
 class Game(Bindable):
     def __init__(self, decks, agents):

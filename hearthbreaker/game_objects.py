@@ -982,7 +982,6 @@ class Minion(Character):
                 if deathrattle is not None:
                     for rattle in deathrattle:
                         rattle.do(self)
-
                         if self.player.double_deathrattle:
                             rattle.do(self)
                 self.player.trigger("minion_died", self, by)

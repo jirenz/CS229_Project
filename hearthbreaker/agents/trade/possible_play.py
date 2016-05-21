@@ -217,7 +217,9 @@ class PlayMixin:
 
             return card
 
-    def play_cards(self, player):
+    def play_cards(self, player, current_depth = 0):
+        if current_depth >= 10:
+            return
         card = self.play_one_card(player)
         if card:
-            self.play_cards(player)
+            self.play_cards(player, current_depth + 1)
