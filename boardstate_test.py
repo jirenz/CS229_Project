@@ -52,20 +52,20 @@ def generate_one(filename):
     try:
         new_game.start()
     except Exception as e:
-       print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
-       print(new_game._all_cards_played)
+       #print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
+       #print(new_game._all_cards_played)
        return False
     # print("winning agent: " + new_game.winner.agent.__class__.__name__)
     game_log.save(filename)
     del new_game
     return True
 
-def generate_number(folder_name, number, prefix):
-    i = 0
-    while i < number:
+def generate_number(folder_name, prefix, start, over):
+    i = start
+    while i < over:
         if generate_one(folder_name + prefix + "_" + str(i)):
             i += 1
 
 if __name__ == "__main__":
-    generate_number("", 10, "test_one")
+    generate_number("projectfiles/LR-statevalue/logfiles/", "test_one", int(sys.argv[1]), int(sys.argv[2]))
 
