@@ -1,3 +1,6 @@
+# hslog file
+*.hslog
+
 *.pyc
 .project
 .pydevproject

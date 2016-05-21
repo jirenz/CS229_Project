@@ -4,8 +4,9 @@ from hearthbreaker.constants import CHARACTER_CLASS
 from hearthbreaker.engine import Deck, card_lookup, Game
 from hearthbreaker.cards import *
 from hearthbreaker.replay import *
-from hearthbreaker.agents.basic_agents import *
+from hearthbreaker.agents import *
 
+from projectfiles.random_deck_generator import RandomDeckGenerator
 import sys
 
 from projectfiles.deck_loader import DeckLoader
@@ -25,7 +26,8 @@ class Hearthlogger:
     def log(self, json_str):
         self.states.append(json_str)
 
-    def save(self, file_name = "default_log.txt"):
+    def save(self, file_name = "default_log"):
+        file_name += ".hslog"
         with open(file_name, "w") as text_file:
             if self.winner:
                 text_file.write("winner: " + self.winner + '\n')
@@ -36,26 +38,34 @@ class Hearthlogger:
         print("Saved to " + file_name + '.\n')
 
 
-def generate():
+def generate_one(filename):
     loader = DeckLoader()
-    deck1 = loader.load_deck("zoo.hsdeck")
-    deck2 = loader.load_deck("zoo.hsdeck")
-    game = Game([deck1, deck2], [RandomAgent(), RandomAgent()])
+    generator = RandomDeckGenerator()
+    # deck1 = loader.load_deck("zoo.hsdeck")
+    # deck2 = loader.load_deck("zoo.hsdeck")
+    deck1 = generator.generate()
+    deck2 = generator.generate()
+    game = Game([deck1, deck2], [TradeAgent(), TradeAgent()])
     new_game = game.copy()
     game_log = Hearthlogger()
     game_log.attach(new_game)
     try:
-        new_game.start_with_debug()
+        new_game.start()
     except Exception as e:
-        print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
-        print(new_game._all_cards_played)
-        game_log.save()
-        raise e
-
-    game_log.save("log1.txt")
+       print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
+       print(new_game._all_cards_played)
+       return False
+    # print("winning agent: " + new_game.winner.agent.__class__.__name__)
+    game_log.save(filename)
     del new_game
-    print("done!")
+    return True
+
+def generate_number(folder_name, number, prefix):
+    i = 0
+    while i < number:
+        if generate_one(folder_name + prefix + "_" + str(i)):
+            i += 1
 
 if __name__ == "__main__":
-    generate()
+    generate_number("", 10, "test_one")
 
