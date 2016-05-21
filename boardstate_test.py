@@ -8,6 +8,7 @@ from hearthbreaker.agents import *
 
 from projectfiles.random_deck_generator import RandomDeckGenerator
 import sys
+import shelve
 
 from projectfiles.deck_loader import DeckLoader
 
@@ -17,6 +18,7 @@ class Hearthlogger:
         self.game = None
         self.states = []
         self.winner = None
+        self.games = []
 
     def attach(self, game):
         game.tracking = True
@@ -25,6 +27,7 @@ class Hearthlogger:
 
     def log(self, json_str):
         self.states.append(json_str)
+        self.games.append(game.copy())
 
     def save(self, file_name = "default_log"):
         file_name += ".hslog"
@@ -37,6 +40,8 @@ class Hearthlogger:
         text_file.close()
         print("Saved to " + file_name + '.\n')
 
+    def shelf(self:
+        pass
 
 def generate_one(filename):
     loader = DeckLoader()
@@ -54,10 +59,14 @@ def generate_one(filename):
     except Exception as e:
        #print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
        #print(new_game._all_cards_played)
+       del new_game
+       del game_log
+
        return False
     # print("winning agent: " + new_game.winner.agent.__class__.__name__)
     game_log.save(filename)
     del new_game
+    del game_log
     return True
 
 def generate_number(folder_name, prefix, start, over):
