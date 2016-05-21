@@ -21,6 +21,7 @@ class GameException(Exception):
 
 
 class Bindable:
+    verbose = False
     """
     A class which inherits from Bindable has an event structure added to it.
 
@@ -120,10 +121,11 @@ class Bindable:
         :param list args: The arguments to pass to the bound function
         :see: :class:`Bindable`
         """
-        if not hasattr(self, 'name'):
-            self.name = ""
-            print("Noname: " + str(vars(self)))
-        print("Event: " + self.__class__.__name__ + " " + self.name + " " + event) #
+        if self.verbose:
+            if not hasattr(self, 'name'):
+                self.name = ""
+                print("Noname: " + str(vars(self)))
+            print("Event: " + self.__class__.__name__ + " " + self.name + " " + event) #
         if event in self.events:
             for handler in copy.copy(self.events[event]):
                 if handler[1]:

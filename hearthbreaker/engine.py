@@ -6,7 +6,7 @@ from hearthbreaker.game_objects import Bindable, GameException, Minion, Hero, We
 import hearthbreaker.tags
 from hearthbreaker.tags.base import Effect, AuraUntil
 import hearthbreaker.targeting
-
+import json
 
 card_table = {}
 
@@ -71,6 +71,7 @@ class Game(Bindable):
         self.selected_card = None
         self.winner = None # added winner 
         self.name = "game"
+        self.tracking = False
 
     def random_draw(self, cards, requirement):
         filtered_cards = [card for card in filter(requirement, cards)]
@@ -138,22 +139,23 @@ class Game(Bindable):
         while not self.game_ended:
             self.play_single_turn()
 
-    def start_with_log(self):
-        self.pre_game()
-        self.current_player = self.players[1]
-        while not self.game_ended:
-            self.play_single_turn()
-            print(self.__to_json__())
-            print(self.current_player.__to_json__())
+    def start_with_debug(self):
+        Bindable.verbose = True
+        self.start()
+        Bindable.verbose = False
 
     def play_single_turn(self):
         self._start_turn()
-        print("Currently at turn: " + str(self._turns_passed))
+        if self.verbose:
+            print("Currently at turn: " + str(self._turns_passed))
         # self.current_player.agent.do_turn(self.current_player)
         self.counter_inturn = 0
+        if self.tracking: #must have logger when game is tracked
+            self.logger.log(json.dumps(self.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
         while self.current_player.agent.do_turn(self.current_player):
             self.counter_inturn += 1
-            print("Action in turn: " + str(self.counter_inturn))
+            if self.verbose:
+                print("Action: " + str(self.counter_inturn))
             if self.game_ended:
                 self.trigger("game_ended", self.winner)
                 break

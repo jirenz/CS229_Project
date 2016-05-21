@@ -19,3 +19,11 @@ The object Game manages all the game states. It has two player objects which sta
 
 First step of the work. 
 In the first part of the project we will generate some games by the existing AI on a specific deck and then record the winning/losing situation of respective game states. We will run some supervised learning algorithms to teach the AI how to evaluate the board.
+
+Extracting feature:
+For each player:
+Hand number:
+Deck depth:
+Mana:
+Hero Health:
+Minion vectors * 7: Attack, Health, Can_attack
