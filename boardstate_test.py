@@ -73,6 +73,8 @@ def generate_number(folder_name, number, prefix):
         if generate_one(folder_name + prefix + "_" + str(i)):
             i += 1
 
+def populate_shelf()
+
 if __name__ == "__main__":
     generate_number("", 10, "test_one")
 
