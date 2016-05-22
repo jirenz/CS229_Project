@@ -40,7 +40,7 @@ class Hearthlogger:
         text_file.close()
         print("Saved to " + file_name + '.\n')
 
-    def shelf(self):
+    def shelf(self,number):
         s = shelve.open("gamefiles.dat")
         s["gamelogger"].append(self)
         s.close()
@@ -76,7 +76,39 @@ def generate_number(folder_name, prefix, start, over):
     while i < over:
         if generate_one(folder_name + prefix + "_" + str(i)):
             i += 1
-            
-if __name__ == "__main__":
-    generate_number("projectfiles/LR-statevalue/logfiles/", "test_one", int(sys.argv[1]), int(sys.argv[2]))
 
+def enshelf_one(index):
+    loader = DeckLoader()
+    generator = RandomDeckGenerator()
+    # deck1 = loader.load_deck("zoo.hsdeck")
+    # deck2 = loader.load_deck("zoo.hsdeck")
+    deck1 = generator.generate()
+    deck2 = generator.generate()
+    new_game = Game([deck1, deck2], [TradeAgent(), TradeAgent()])
+    game_log = Hearthlogger()
+    game_log.attach(new_game)
+    try:
+        new_game.start()
+    except Exception as e:
+       #print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
+       #print(new_game._all_cards_played)
+       del new_game
+       del game_log
+       return False
+    # print("winning agent: " + new_game.winner.agent.__class__.__name__)
+    game_log.shelf(index)
+    del new_game
+    del game_log
+    return True
+
+def populate_shelf(start, over):
+    i = start
+    while i < over:
+        if enshelf_one(i):
+            i += 1
+
+if __name__ == "__main__":
+    if sys.argv[1] == "-j":
+        generate_number("projectfiles/LR-statevalue/logfiles/", "test_one", int(sys.argv[2]), int(sys.argv[3]))
+    if sys.argv[1] == "-s":
+        populate_shelf(int(sys.argv[2]), int(sys.argv[3])
