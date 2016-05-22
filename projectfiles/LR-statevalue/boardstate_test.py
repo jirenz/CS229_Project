@@ -41,9 +41,9 @@ class Hearthlogger:
         print("Saved to " + file_name + '.\n')
 
     def shelf(self,number):
-        s = shelve.open("projectfiles/LR-statevalue/gamefiles.dat",writeback=True)
+        s = shelve.open("projectfiles/LR-statevalue/gamefiles.dat")
         if not "gamelogger" in s:
-            s["gamelogger"] = []
+        	s["gamelogger"] = []
         s["gamelogger"].append(self)
         s.close()
 
