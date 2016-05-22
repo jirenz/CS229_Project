@@ -40,8 +40,10 @@ class Hearthlogger:
         text_file.close()
         print("Saved to " + file_name + '.\n')
 
-    def shelf(self:
-        pass
+    def shelf(self):
+        s = shelve.open("gamefiles.dat")
+        s["gamelogger"].append(self)
+        s.close()
 
 def generate_one(filename):
     loader = DeckLoader()
@@ -74,7 +76,7 @@ def generate_number(folder_name, prefix, start, over):
     while i < over:
         if generate_one(folder_name + prefix + "_" + str(i)):
             i += 1
-
+            
 if __name__ == "__main__":
     generate_number("projectfiles/LR-statevalue/logfiles/", "test_one", int(sys.argv[1]), int(sys.argv[2]))
 
