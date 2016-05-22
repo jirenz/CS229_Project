@@ -7,6 +7,7 @@ from hearthbreaker.replay import *
 from hearthbreaker.agents import *
 
 from projectfiles.random_deck_generator import RandomDeckGenerator
+from projectfiles.agent import *
 import sys
 import shelve
 
@@ -17,7 +18,7 @@ def test_agent_once():
     generator = RandomDeckGenerator()
     deck1 = generator.generate()
     deck2 = deck1.copy()
-    game = Game([deck1, deck2], [TradeAgent(), RandomAgent()])
+    game = Game([deck1, deck2], [AIAgent(), RandomAgent()])
     new_game = game.copy()
     try:
         new_game.start_with_debug()
