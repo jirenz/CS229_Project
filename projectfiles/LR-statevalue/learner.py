@@ -1,6 +1,8 @@
 from sklearn import linear_model
-# each player information: [attack,health,can_attack?]
-# state information f=[(minion1),...,(minion7),hero_health,hero_armor,state_value]
+# each minion information: [attack,health,can_attack?]
+# state information f=[(minion1),...,(minion7),hero_health,hero_armor,
+#                      (oppo_minion1),...,(oppo_minion7),oppo_hero_health,oppo_hero_armor,
+#                      state_value]
 
 def learner(array_f, NumFeat):
 	# this function receives a vector of state information (NumFeat-dimension, not including state_value)
@@ -10,7 +12,7 @@ def learner(array_f, NumFeat):
 	y = []
 	for i in array_f:
 		y.append(i[NumFeat])
-		X.append([1, i[0:NumFeat]])
+		X.append([1]+i[0:NumFeat])
 	clf.fit(X, y)
 	return clf.coef_
 
