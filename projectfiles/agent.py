@@ -35,12 +35,25 @@ class DoFixedThingsMachine(Agent):
 		return options[random.randint(0, len(options) - 1)]
 
 class AIAgent(DoNothingAgent):
-	def __init__(self, eta, explore_prob, feature_extractor):
+	def __init__(self, eta, explore_prob, discount, feature_extractor, learn = True):
 		super().__init__()
+
+		def wrap_feature_extractor(feature_extractor):
+			def wrapped_feature_extractor(game, action):
+				next_game = game.copy()
+				next_game.current_player.agent = DoFixedThingsMachine(*action)
+				next_game.current_player.agent.do_turn(next_game.current_player)
+				return feature_extractor(game, next_game, action)
+				# return feature_extractor(next_game.current_player)
+			
+			return wrapped_feature_extractor
+
 		self.eta = eta
 		self.explore_prob = explore_prob
-		self.feature_extractor = feature_extractor
+		self.discount = discount
+		self.feature_extractor = wrap_feature_extractor(feature_extractor)
 		self.weights = None
+		self.learn = learn
 
 	def do_card_check(self, cards):
 		return [True, True, True, True]
@@ -86,46 +99,40 @@ class AIAgent(DoNothingAgent):
 			return max((self.Q(self.player.game, action), action) for action in actions)[1]
 
 	def Q(self, game, action):
-		copied_game = game.copy()
-		copied_game.current_player.agent = DoFixedThingsMachine(*action)
-		copied_game.current_player.agent.do_turn(copied_game.current_player)
-		total = np.dot(self.weights, self.feature_extractor(copied_game.current_player))
-		del copied_game
-		return total
+		if self.weights is None:
+			self.weights = np.zeros(np.size(self.feature_extractor(game, action)))
+		return np.dot(self.weights, self.feature_extractor(game, action))
 
 	def do_turn(self, player):
-		# copied_game = self.player.game.copy()
-		if self.weights is None:
-			self.weights = np.zeros(np.size(self.feature_extractor(player)))
-
 		self.player = player
-		old_health = self.player.opponent.hero.health
+
 		actions = self.get_actions(self.player)
 		if len(actions) == 0:
 			return False
 
-		best_decision = self.decide(actions) #copied_game)
+		best_decision = self.decide(actions)
 
 		oldQ = self.Q(self.player.game, best_decision)
+		oldPhi = self.feature_extractor(self.player.game, best_decision)
 		self.machine = DoFixedThingsMachine(*best_decision)
 		self.machine.do_turn(self.player)
-		new_health = self.player.opponent.hero.health
 
-		reward = old_health - new_health
+		reward = 0.0
 		if self.player.game.game_ended:
+			print("check", self.player.game.winner,self.player,self.player.opponent)
 			if self.player.game.winner is self.player:
-				newV = 100.0
+				reward = 100.0
 			elif self.player.game.winner is None:
-				newV = 0.0
+				reward = 0.0
 			else:
-				newV = -100.0
-		else:
-			actions = self.get_actions(self.player)
-			newV = max(self.Q(self.player.game, action) for action in actions) if len(actions) > 0 else 0
-			# newV = np.dot(self.weight, self.feature_extractor(self.player))
+				reward = -100.0
 
-		self.weights += self.eta * (reward + 0.9 * newV - oldQ) * self.feature_extractor(self.player)
-		self.weights /= np.sqrt(np.dot(self.weights, self.weights)) + 1e-6
+		actions = self.get_actions(self.player)
+		newV = max(self.Q(self.player.game, action) for action in actions) if len(actions) > 0 else 0
+
+		if self.learn:
+			self.weights += self.eta * (reward + self.discount * newV - oldQ) * oldPhi
+			self.weights /= np.sqrt(np.dot(self.weights, self.weights)) + 1e-6
 
 		return True
 
