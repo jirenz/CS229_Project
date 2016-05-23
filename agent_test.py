@@ -16,6 +16,14 @@ from projectfiles.agent import *
 from projectfiles.feature_extract import *
 from projectfiles.feature_extract_2 import *
 
+from sparklines import sparklines
+
+def spark_weights(weights):
+	W = weights - np.min(weights)
+	W = W * 30 / np.max(W)
+	for line in sparklines(list(W), num_lines = 3):
+		print(line)
+
 def test_agent_once(ql, other = None):
 	generator = RandomDeckGenerator()
 	deck1 = generator.generate()
@@ -35,7 +43,7 @@ def test_agent_once(ql, other = None):
 		del new_game
 		return False
 	print("winning agent: " + new_game.winner.agent.__class__.__name__)
-	print(ql.weights)
+	spark_weights(ql.weights)
 	return new_game.winner.agent.__class__.__name__
 
 def run_agent(ql, other, number):
@@ -58,5 +66,3 @@ if __name__ == "__main__":
 	ql.explore_prob = 0.0
 	ql.learn = False
 	run_agent(ql, None, int(sys.argv[2]))
-
-
