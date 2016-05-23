@@ -7,6 +7,7 @@ from hearthbreaker.replay import *
 from hearthbreaker.agents import *
 
 from projectfiles.random_deck_generator import RandomDeckGenerator
+from projectfiles.agent import *
 import sys
 import shelve
 
@@ -58,6 +59,7 @@ def run_agent(ql, other, number):
 			else:
 				winning_count[winner] = 1
 	print(winning_count)
+
 
 if __name__ == "__main__":
 	ql = AIAgent(eta = 0.001, explore_prob = 0.1, discount = 0.5, feature_extractor = feature_extractor_2)

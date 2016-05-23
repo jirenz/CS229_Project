@@ -137,6 +137,7 @@ class AIAgent(DoNothingAgent):
 		return True
 
 	def choose_target(self, targets):
+		print("Target chosen")
 		return self.machine.choose_target(targets)
 
 	def choose_index(self, card, player):
