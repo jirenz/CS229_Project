@@ -14,6 +14,7 @@ from projectfiles.deck_loader import DeckLoader
 from projectfiles.hearthlogger import Hearthlogger
 from projectfiles.agent import *
 from projectfiles.feature_extract import *
+from projectfiles.feature_extract_2 import *
 
 def test_agent_once(ql, other = None):
 	generator = RandomDeckGenerator()
