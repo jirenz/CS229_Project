@@ -21,8 +21,6 @@ class DoFixedThingsMachine(Agent):
 			player.game.play_card(player.hand[self.entity_index])
 		elif self.chosen_index == 3:
 			player.hero.power.use()
-		elif self.chosen_index == 4:
-			pass
 
 	def choose_target(self, targets):
 		if self.target_index is not None:
@@ -79,9 +77,6 @@ class AIAgent(DoNothingAgent):
 		if player.hero.power.can_use():
 			actions += [(3, None, None)]
 
-		if len(actions) == 0:
-			actions += [(4, None, None)]
-
 		return actions
 
 	def decide(self, actions):
@@ -104,17 +99,19 @@ class AIAgent(DoNothingAgent):
 			self.weights = np.zeros(np.size(self.feature_extractor(player)))
 
 		self.player = player
+		old_health = self.player.opponent.hero.health
 		actions = self.get_actions(self.player)
 		if len(actions) == 0:
-			return
+			return False
 
 		best_decision = self.decide(actions) #copied_game)
 
 		oldQ = self.Q(self.player.game, best_decision)
 		self.machine = DoFixedThingsMachine(*best_decision)
 		self.machine.do_turn(self.player)
+		new_health = self.player.opponent.hero.health
 
-		reward = 0.0
+		reward = old_health - new_health
 		if self.player.game.game_ended:
 			if self.player.game.winner is self.player:
 				newV = 100.0
@@ -124,11 +121,16 @@ class AIAgent(DoNothingAgent):
 				newV = -100.0
 		else:
 			actions = self.get_actions(self.player)
-			newV = max(self.Q(self.player.game, action) for action in actions)
+			newV = max(self.Q(self.player.game, action) for action in actions) if len(actions) > 0 else 0
+			# newV = np.dot(self.weight, self.feature_extractor(self.player))
 
-		self.weights += self.eta * (reward + 1.0 * newV - oldQ) * self.feature_extractor(self.player)
+		self.weights += self.eta * (reward + 0.9 * newV - oldQ) * self.feature_extractor(self.player)
+		self.weights /= np.sqrt(np.dot(self.weights, self.weights)) + 1e-6
+
+		return True
 
 	def choose_target(self, targets):
+		print("Target chosen")
 		return self.machine.choose_target(targets)
 
 	def choose_index(self, card, player):
