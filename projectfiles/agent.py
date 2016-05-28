@@ -1,6 +1,7 @@
 from hearthbreaker.agents.basic_agents import *
 import collections
 import numpy as np
+import json
 
 class DoFixedThingsMachine(Agent):
 	def __init__(self, chosen_index, entity_index, target_index, minion_position_index = 0):
@@ -41,7 +42,6 @@ class GameHelper():
 	def generate_actions(self, game):
 		player = game.current_player
 		if game.game_ended: return []
-
 		actions = []
 		enemy_targets = self.get_enemy_targets(player)
 		for i, attack_minion in filter(lambda p: p[1].can_attack(), enumerate(player.minions)):
@@ -77,8 +77,14 @@ class GameHelper():
 	def excecute(self, game, action):
 		machine = DoFixedThingsMachine(*action)
 		game.current_player.agent = machine
-		machine.do_turn(game.current_player)
+		try:
+			machine.do_turn(game.current_player)
+		except Exception as e:
+			print(self.game_to_json(game))
 		return game
+
+	def game_to_json(self, game):
+	 	return json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1)
 
 class StrategyNode():
 	def __init__(self, game):
