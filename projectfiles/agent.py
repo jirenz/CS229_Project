@@ -48,7 +48,7 @@ class Strategy_node():
 		for i, attack_minion in filter(lambda p: p[1].can_attack(), enumerate(player.minions)):
 			actions += [(0, i, target) for target in range(len(enemy_targets))]
 		if player.hero.can_attack():
-			actions += [(1, None, target) for target in range(len(minion_targets))]
+			actions += [(1, None, target) for target in range(len(enemy_targets))]
 		for i, card in filter(lambda p: p[1].can_use(player, player.game), enumerate(player.hand)):
 			try:
 				actions += [(2, i, target) for target in range(len(card.targets))]
@@ -56,7 +56,8 @@ class Strategy_node():
 				actions += [(2, i, None)]
 		if player.hero.power.can_use():
 			actions += [(3, None, None)]
-		# print("action_size: " + str(len(actions)))
+		if len(actions) > 5:
+			print("action_size: " + str(len(actions)))
 		return actions
 
 	def get_enemy_targets(self, player):
@@ -146,7 +147,7 @@ class AIAgent(DoNothingAgent):
 		for i, attack_minion in filter(lambda p: p[1].can_attack(), enumerate(player.minions)):
 			actions += [(0, i, target) for target in range(len(enemy_targets))]
 		if player.hero.can_attack():
-			actions += [(1, None, target) for target in range(len(minion_targets))]
+			actions += [(1, None, target) for target in range(len(enemy_targets))]
 		for i, card in filter(lambda p: p[1].can_use(player, player.game), enumerate(player.hand)):
 			try:
 				actions += [(2, i, target) for target in range(len(card.targets))]
