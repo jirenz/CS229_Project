@@ -119,7 +119,7 @@ class AIAgent(DoNothingAgent):
 
 		reward = 0.0
 		if self.player.game.game_ended:
-			print("check", self.player.game.winner,self.player,self.player.opponent)
+			#print("check", self.player.game.winner,self.player,self.player.opponent)
 			if self.player.game.winner is self.player:
 				reward = 100.0
 			elif self.player.game.winner is None:
@@ -137,7 +137,7 @@ class AIAgent(DoNothingAgent):
 		return True
 
 	def choose_target(self, targets):
-		print("Target chosen")
+		#print("Target chosen")
 		return self.machine.choose_target(targets)
 
 	def choose_index(self, card, player):
