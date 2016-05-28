@@ -34,9 +34,8 @@ class DoFixedThingsMachine(Agent):
 	def choose_option(self, options, player):
 		return options[random.randint(0, len(options) - 1)]
 
-class Strategy_node():
-	def __init__(self, game):
-		self.generate_strategies(game)
+class GameHelper():
+	def __init__(self):
 		pass
 
 	def generate_actions(self, game):
@@ -59,7 +58,7 @@ class Strategy_node():
 		if len(actions) > 5:
 			print("action_size: " + str(len(actions)))
 		return actions
-
+	
 	def get_enemy_targets(self, player):
 		found_taunt = False
 		targets = []
@@ -72,7 +71,7 @@ class Strategy_node():
 		if found_taunt:
 			targets = [target for target in targets if target.taunt]
 		else:
-			targets.append(self.game.other_player.hero)
+			targets.append(player.game.other_player.hero)
 		return targets
 
 	def excecute(self, game, action):
@@ -81,14 +80,19 @@ class Strategy_node():
 		machine.do_turn(game.current_player)
 		return game
 
+class StrategyNode():
+	def __init__(self, game):
+		self.helper = GameHelper()
+		self.generate_strategies(game)
+
 	def generate_strategies(self, game):
 		self.game = game
 		self.substrategies = []
-		self.actions = self.generate_actions(game)
+		self.actions = self.helper.generate_actions(game)
 		for action in self.actions:
 			outcome = game.copy()
-			self.excecute(outcome, action)
-			self.substrategies.append([action, Strategy_node(outcome)])
+			self.helper.excecute(outcome, action)
+			self.substrategies.append([action, StrategyNode(outcome)])
 
 	def get_outcomes(self):
 		outcome = [] # action_list game(reference)
