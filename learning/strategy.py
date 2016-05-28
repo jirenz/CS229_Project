@@ -4,8 +4,6 @@ import collections
 import numpy as np
 from projectfiles.feature_extract import *
 
-
-
 class DoFixedThingsMachine(Agent):
     def __init__(self, chosen_index, entity_index, target_index, minion_position_index = 0):
         self.chosen_index = chosen_index
@@ -91,7 +89,7 @@ class GameHelper():
 		state_list = feature_extractor(player)
 		ans = 1
 		for i in state_list:
-			ans = (ans * self.base + i ) % self.bigp;
+			ans = (ans * self.base + i ) % self.bigp
 		return ans
 
 	def game_to_json(self, game):
