@@ -112,9 +112,8 @@ class RandomAgent(DoNothingAgent):
                 attack_minions[action].attack()
             else:
                 player.game.play_card(playable_cards[action - len(attack_minions)])
-            return True
         else:
-            return False
+            return
 
     def choose_target(self, targets):
         return targets[random.randint(0, len(targets) - 1)]

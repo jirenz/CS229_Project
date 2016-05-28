@@ -147,19 +147,15 @@ class Game(Bindable):
 
     def play_single_turn(self):
         self._start_turn()
-        if self.verbose:
-            print("Currently at turn: " + str(self._turns_passed))
+        # if self.verbose:
+        print("Currently at turn: " + str(self._turns_passed))
         # self.current_player.agent.do_turn(self.current_player)
         self.counter_inturn = 0
         if self.tracking: #must have logger when game is tracked
             self.logger.log(json.dumps(self.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
-        while self.current_player.agent.do_turn(self.current_player):
-            self.counter_inturn += 1
-            if self.verbose:
-                print("Action: " + str(self.counter_inturn))
-            if self.game_ended:
-                self.trigger("game_ended", self.winner)
-                break
+        self.current_player.agent.do_turn(self.current_player):
+        if self.game_ended:
+            self.trigger("game_ended", self.winner)
         self._end_turn()
 
     def _start_turn(self):

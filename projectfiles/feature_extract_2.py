@@ -65,5 +65,6 @@ def feature_extractor_2(game, next_game, action):
 	prefix_update(feat, oppo_gain, 'oppo-gain-')
 	prefix_update(feat, relative_gain, 'relative-gain-')
 
+	del next_game
 	# print(feat)
 	return np.array(list(feat.values()), dtype=np.float64)
