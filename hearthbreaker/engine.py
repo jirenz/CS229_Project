@@ -153,7 +153,7 @@ class Game(Bindable):
         self.counter_inturn = 0
         if self.tracking: #must have logger when game is tracked
             self.logger.log(json.dumps(self.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
-        self.current_player.agent.do_turn(self.current_player):
+        self.current_player.agent.do_turn(self.current_player)
         if self.game_ended:
             self.trigger("game_ended", self.winner)
         self._end_turn()
