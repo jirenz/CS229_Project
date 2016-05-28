@@ -37,8 +37,8 @@ def test_agent_once(ql, other = None):
 	# game = Game([deck1, deck2], [TradeAgent(), RandomAgent()])
 	new_game = game.copy()
 	try:
-		# new_game.start_with_debug()
 		new_game.start()
+		# new_game.start()
 	except Exception as e:
 		#print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
 		#print(new_game._all_cards_played)

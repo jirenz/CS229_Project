@@ -34,12 +34,18 @@ class DoFixedThingsMachine(Agent):
 	def choose_option(self, options, player):
 		return options[random.randint(0, len(options) - 1)]
 
+class Strategies():
+	def __init__(self):
+
+	def 
+	
 class AIAgent(DoNothingAgent):
 	def __init__(self, eta, explore_prob, discount, feature_extractor, learn = True):
 		super().__init__()
 
 		def wrap_feature_extractor(feature_extractor):
 			def wrapped_feature_extractor(game, action):
+
 				next_game = game.copy()
 				next_game.current_player.agent = DoFixedThingsMachine(*action)
 				next_game.current_player.agent.do_turn(next_game.current_player)
@@ -89,7 +95,7 @@ class AIAgent(DoNothingAgent):
 				actions += [(2, i, None)]
 		if player.hero.power.can_use():
 			actions += [(3, None, None)]
-
+		print("action_size: " + str(len(actions)))
 		return actions
 
 	def decide(self, actions):
@@ -137,7 +143,6 @@ class AIAgent(DoNothingAgent):
 		return True
 
 	def choose_target(self, targets):
-		#print("Target chosen")
 		return self.machine.choose_target(targets)
 
 	def choose_index(self, card, player):

@@ -116,7 +116,7 @@ class TradeAgent(TradeMixin, AttackMixin, PlayMixin, ChooseTargetMixin, DoNothin
         if not player.game.game_ended:
             self.play_cards(player)
 
-        return False
+        return
 
     def do_card_check(self, cards):
         return [True, True, True, True]
