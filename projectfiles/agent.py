@@ -3,9 +3,6 @@ import collections
 import numpy as np
 from projectfiles.feature_extract import *
 
-base = 314159
-bigp = 1000000007;
-
 class DoFixedThingsMachine(Agent):
     def __init__(self, chosen_index, entity_index, target_index, minion_position_index = 0):
         self.chosen_index = chosen_index
@@ -38,209 +35,115 @@ class DoFixedThingsMachine(Agent):
     def choose_option(self, options, player):
         return options[random.randint(0, len(options) - 1)]
 
-class GameHelper():
-    def __init__(self):
-        pass
-
-    def generate_actions(self, game):
-        player = game.current_player
-        if game.game_ended: return []
-
-        actions = []
-        enemy_targets = self.get_enemy_targets(player)
-        for i, attack_minion in filter(lambda p: p[1].can_attack(), enumerate(player.minions)):
-            actions += [(0, i, target) for target in range(len(enemy_targets))]
-        if player.hero.can_attack():
-            actions += [(1, None, target) for target in range(len(enemy_targets))]
-        for i, card in filter(lambda p: p[1].can_use(player, player.game), enumerate(player.hand)):
-            try:
-                actions += [(2, i, target) for target in range(len(card.targets))]
-            except:
-                actions += [(2, i, None)]
-        if player.hero.power.can_use():
-            actions += [(3, None, None)]
-        #if len(actions) > 5:
-        #   print("action_size: " + str(len(actions)))
-        return actions
-    
-    def get_enemy_targets(self, player):
-        found_taunt = False
-        targets = []
-        for enemy in player.game.other_player.minions:
-            if enemy.taunt and enemy.can_be_attacked():
-                found_taunt = True
-            if enemy.can_be_attacked():
-                targets.append(enemy)
-
-        if found_taunt:
-            targets = [target for target in targets if target.taunt]
-        else:
-            targets.append(player.game.other_player.hero)
-        return targets
-
-    def excecute(self, game, action):
-        machine = DoFixedThingsMachine(*action)
-        game.current_player.agent = machine
-        machine.do_turn(game.current_player)
-        return game
-    
-    def hashgame(self,game):
-        player = game.current_player
-        state_list = feature_extractor(player)
-        ans = 1
-        for i in state_list:
-            ans = (ans * base + i ) % bigp;
-        return ans
-
-
-    def game_to_json(self, game):
-        return json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1)
-        
-
-class StrategyNode(GameHelper):
-    def __init__(self, game, state_set):
-        self.generate_strategies(game, state_set)
-
-    def generate_strategies(self, game, state_set):
-        game_hash = self.hashgame(game);
-        if not (game_hash in state_set):
-            state_set.add(game_hash)
-            self.game = game
-            self.substrategies = []
-            self.actions = self.generate_actions(game)
-            for action in self.actions:
-                outcome = game.copy()
-                self.excecute(outcome, action)
-                self.substrategies.append([action, StrategyNode(outcome, state_set)])
-        else:
-            self.game = None
-            # print("hash collision found!")
-
-    def get_outcomes(self):
-        if (self.game == None): return []
-        outcome = [] # action_list game(reference)
-        outcome.append(self.game)
-        for [action, strategy] in self.substrategies:
-            outcome += strategy.get_outcomes()
-        return outcome
-
-class StrategyManager():
-    def __init__(self, game):
-        self.store_state = set()
-        self.strategy_node = StrategyNode(game, self.store_state);
-    
-    def get_outcomes(self):
-        return self.strategy_node.get_outcomes()
-
 class AIAgent(DoNothingAgent):
-    def __init__(self, eta, explore_prob, discount, feature_extractor, learn = True):
-        super().__init__()
+	def __init__(self, eta, explore_prob, discount, feature_extractor, learn = True):
+		super().__init__()
 
-        def wrap_feature_extractor(feature_extractor):
-            def wrapped_feature_extractor(game, action):
+		def wrap_feature_extractor(feature_extractor):
+			def wrapped_feature_extractor(game, action):
 
-                next_game = game.copy()
-                next_game.current_player.agent = DoFixedThingsMachine(*action)
-                next_game.current_player.agent.do_turn(next_game.current_player)
-                return feature_extractor(game, next_game, action)
-                # return feature_extractor(next_game.current_player)
-            
-            return wrapped_feature_extractor
+				next_game = game.copy()
+				next_game.current_player.agent = DoFixedThingsMachine(*action)
+				next_game.current_player.agent.do_turn(next_game.current_player)
+				return feature_extractor(game, next_game, action)
+			# return feature_extractor(next_game.current_player)
 
-        self.eta = eta
-        self.explore_prob = explore_prob
-        self.discount = discount
-        self.feature_extractor = wrap_feature_extractor(feature_extractor)
-        self.weights = None
-        self.learn = learn
+			return wrapped_feature_extractor
 
-    def do_card_check(self, cards):
-        return [True, True, True, True]
+		self.eta = eta
+		self.explore_prob = explore_prob
+		self.discount = discount
+		self.feature_extractor = wrap_feature_extractor(feature_extractor)
+		self.weights = None
+		self.learn = learn
 
-    def get_enemy_targets(self, player):
-        found_taunt = False
-        targets = []
-        for enemy in player.game.other_player.minions:
-            if enemy.taunt and enemy.can_be_attacked():
-                found_taunt = True
-            if enemy.can_be_attacked():
-                targets.append(enemy)
+	def do_card_check(self, cards):
+		return [True, True, True, True]
 
-        if found_taunt:
-            targets = [target for target in targets if target.taunt]
-        else:
-            targets.append(self.player.game.other_player.hero)
-        return targets
+	def get_enemy_targets(self, player):
+		found_taunt = False
+		targets = []
+		for enemy in player.game.other_player.minions:
+			if enemy.taunt and enemy.can_be_attacked():
+				found_taunt = True
+			if enemy.can_be_attacked():
+				targets.append(enemy)
 
-    def get_actions(self, player):
-        if player.game.game_ended: return []
+		if found_taunt:
+			targets = [target for target in targets if target.taunt]
+		else:
+			targets.append(self.player.game.other_player.hero)
+		return targets
 
-        actions = []
-        enemy_targets = self.get_enemy_targets(player)
-        for i, attack_minion in filter(lambda p: p[1].can_attack(), enumerate(player.minions)):
-            actions += [(0, i, target) for target in range(len(enemy_targets))]
-        if player.hero.can_attack():
-            actions += [(1, None, target) for target in range(len(enemy_targets))]
-        for i, card in filter(lambda p: p[1].can_use(player, player.game), enumerate(player.hand)):
-            try:
-                actions += [(2, i, target) for target in range(len(card.targets))]
-            except:
-                actions += [(2, i, None)]
-        if player.hero.power.can_use():
-            actions += [(3, None, None)]
-        # print("action_size: " + str(len(actions)))
-        return actions
+	def get_actions(self, player):
+		if player.game.game_ended: return []
 
-    def decide(self, actions):
-        if random.random() < self.explore_prob:
-            return random.choice(actions)
-        else:
-            return max((self.Q(self.player.game, action), action) for action in actions)[1]
+		actions = []
+		enemy_targets = self.get_enemy_targets(player)
+		for i, attack_minion in filter(lambda p: p[1].can_attack(), enumerate(player.minions)):
+			actions += [(0, i, target) for target in range(len(enemy_targets))]
+		if player.hero.can_attack():
+			actions += [(1, None, target) for target in range(len(enemy_targets))]
+		for i, card in filter(lambda p: p[1].can_use(player, player.game), enumerate(player.hand)):
+			try:
+				actions += [(2, i, target) for target in range(len(card.targets))]
+			except:
+				actions += [(2, i, None)]
+		if player.hero.power.can_use():
+			actions += [(3, None, None)]
+		# print("action_size: " + str(len(actions)))
+		return actions
 
-    def Q(self, game, action):
-        if self.weights is None:
-            self.weights = np.zeros(np.size(self.feature_extractor(game, action)))
-        return np.dot(self.weights, self.feature_extractor(game, action))
+	def decide(self, actions):
+		if random.random() < self.explore_prob:
+			return random.choice(actions)
+		else:
+			return max((self.Q(self.player.game, action), action) for action in actions)[1]
 
-    def do_turn(self, player):
-        self.player = player
+	def Q(self, game, action):
+		if self.weights is None:
+			self.weights = np.zeros(np.size(self.feature_extractor(game, action)))
+		return np.dot(self.weights, self.feature_extractor(game, action))
 
-        actions = self.get_actions(self.player)
-        if len(actions) == 0:
-            return False
+	def do_turn(self, player):
+		self.player = player
 
-        best_decision = self.decide(actions)
+		actions = self.get_actions(self.player)
+		if len(actions) == 0:
+			return False
 
-        oldQ = self.Q(self.player.game, best_decision)
-        oldPhi = self.feature_extractor(self.player.game, best_decision)
-        self.machine = DoFixedThingsMachine(*best_decision)
-        self.machine.do_turn(self.player)
+		best_decision = self.decide(actions)
 
-        reward = 0.0
-        if self.player.game.game_ended:
-            #print("check", self.player.game.winner,self.player,self.player.opponent)
-            if self.player.game.winner is self.player:
-                reward = 100.0
-            elif self.player.game.winner is None:
-                reward = 0.0
-            else:
-                reward = -100.0
+		oldQ = self.Q(self.player.game, best_decision)
+		oldPhi = self.feature_extractor(self.player.game, best_decision)
+		self.machine = DoFixedThingsMachine(*best_decision)
+		self.machine.do_turn(self.player)
 
-        actions = self.get_actions(self.player)
-        newV = max(self.Q(self.player.game, action) for action in actions) if len(actions) > 0 else 0
+		reward = 0.0
+		if self.player.game.game_ended:
+			#print("check", self.player.game.winner,self.player,self.player.opponent)
+			if self.player.game.winner is self.player:
+				reward = 100.0
+			elif self.player.game.winner is None:
+				reward = 0.0
+			else:
+				reward = -100.0
 
-        if self.learn:
-            self.weights += self.eta * (reward + self.discount * newV - oldQ) * oldPhi
-            self.weights /= np.sqrt(np.dot(self.weights, self.weights)) + 1e-6
+		actions = self.get_actions(self.player)
+		newV = max(self.Q(self.player.game, action) for action in actions) if len(actions) > 0 else 0
 
-        return True
+		if self.learn:
+			self.weights += self.eta * (reward + self.discount * newV - oldQ) * oldPhi
+			self.weights /= np.sqrt(np.dot(self.weights, self.weights)) + 1e-6
 
-    def choose_target(self, targets):
-        return self.machine.choose_target(targets)
+		return True
 
-    def choose_index(self, card, player):
-        return self.machine.choose_index(card, player)
+	def choose_target(self, targets):
+		return self.machine.choose_target(targets)
 
-    def choose_option(self, options, player):
-        options = self.filter_options(options, player)
-        return self.machine.choose_option(options, player)
+	def choose_index(self, card, player):
+		return self.machine.choose_index(card, player)
+
+	def choose_option(self, options, player):
+		options = self.filter_options(options, player)
+		return self.machine.choose_option(options, player)
