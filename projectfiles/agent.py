@@ -34,11 +34,70 @@ class DoFixedThingsMachine(Agent):
 	def choose_option(self, options, player):
 		return options[random.randint(0, len(options) - 1)]
 
-class Strategies():
-	def __init__(self):
+class Strategy_node():
+	def __init__(self, game):
+		self.generate_strategies(game)
+		pass
 
-	def 
-	
+	def generate_actions(self, game):
+		player = game.current_player
+		if game.game_ended: return []
+
+		actions = []
+		enemy_targets = self.get_enemy_targets(player)
+		for i, attack_minion in filter(lambda p: p[1].can_attack(), enumerate(player.minions)):
+			actions += [(0, i, target) for target in range(len(enemy_targets))]
+		if player.hero.can_attack():
+			actions += [(1, None, target) for target in range(len(minion_targets))]
+		for i, card in filter(lambda p: p[1].can_use(player, player.game), enumerate(player.hand)):
+			try:
+				actions += [(2, i, target) for target in range(len(card.targets))]
+			except:
+				actions += [(2, i, None)]
+		if player.hero.power.can_use():
+			actions += [(3, None, None)]
+		# print("action_size: " + str(len(actions)))
+		return actions
+
+	def get_enemy_targets(self, player):
+		found_taunt = False
+		targets = []
+		for enemy in player.game.other_player.minions:
+			if enemy.taunt and enemy.can_be_attacked():
+				found_taunt = True
+			if enemy.can_be_attacked():
+				targets.append(enemy)
+
+		if found_taunt:
+			targets = [target for target in targets if target.taunt]
+		else:
+			targets.append(self.game.other_player.hero)
+		return targets
+
+	def excecute(self, game, action):
+		machine = DoFixedThingsMachine(*action)
+		game.current_player.agent = machine
+		machine.do_turn(game.current_player)
+		return game
+
+	def generate_strategies(self, game):
+		self.game = game
+		self.substrategies = []
+		self.actions = self.generate_actions(game)
+		for action in self.actions:
+			outcome = game.copy()
+			self.excecute(outcome, action)
+			self.substrategies.append([action, Strategy_node(outcome)])
+
+	def get_outcomes(self):
+		outcome = [] # action_list game(reference)
+		outcome.append(self.game)
+		for [action, strategy] in self.substrategies:
+			outcome += strategy.get_outcomes()
+		return outcome
+
+
+
 class AIAgent(DoNothingAgent):
 	def __init__(self, eta, explore_prob, discount, feature_extractor, learn = True):
 		super().__init__()
