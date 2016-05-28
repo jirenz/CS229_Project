@@ -28,7 +28,7 @@ def test_strategy():
     game.current_player = game.players[1]
     while not game.game_ended:
         manager = StrategyManager(None)
-        print("Number of outcomes: " + str(len(manager(game))) + '\n')
+        print("Number of outcomes: " + str(len(manager.get_outcomes(game))) + '\n')
         game.play_single_turn()
 
 
