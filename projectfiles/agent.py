@@ -92,11 +92,9 @@ class GameHelper():
 			ans = (ans * base + i ) % bigp;
 		return ans
 
-
 	def game_to_json(self, game):
 	 	return json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1)
 	 	
-
 class StrategyNode(GameHelper):
 	def __init__(self, game, state_set):
 		self.generate_strategies(game, state_set)
