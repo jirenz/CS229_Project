@@ -22,8 +22,8 @@ from sparklines import sparklines
 def spark_weights(weights):
 	W = weights - np.min(weights)
 	W = W * 30 / np.max(W)
-	for line in sparklines(list(W), num_lines = 3):
-		print(line)
+	#for line in sparklines(list(W), num_lines = 3):
+	#	print(line)
 
 def test_agent_once(ql, other = None):
 	generator = RandomDeckGenerator()
@@ -32,6 +32,7 @@ def test_agent_once(ql, other = None):
 
 	if other is None:
 		other = TradeAgent()
+		#other = RandomAgent()
 	game = Game([deck1, deck2], [ql, other])
 	# game = Game([deck1, deck2], [TradeAgent(), RandomAgent()])
 	new_game = game.copy()
