@@ -36,8 +36,8 @@ class DoFixedThingsMachine(Agent):
 
 class Strategy_node():
 	def __init__(self, game):
+		self.store_state = set()
 		self.generate_strategies(game)
-		pass
 
 	def generate_actions(self, game):
 		player = game.current_player
@@ -81,13 +81,15 @@ class Strategy_node():
 		return game
 
 	def generate_strategies(self, game):
-		self.game = game
-		self.substrategies = []
-		self.actions = self.generate_actions(game)
-		for action in self.actions:
-			outcome = game.copy()
-			self.excecute(outcome, action)
-			self.substrategies.append([action, Strategy_node(outcome)])
+		if not (game in self.store_state):
+			self.store_state.add(game)
+			self.game = game
+			self.substrategies = []
+			self.actions = self.generate_actions(game)
+			for action in self.actions:
+				outcome = game.copy()
+				self.excecute(outcome, action)
+				self.substrategies.append([action, Strategy_node(outcome)])
 
 	def get_outcomes(self):
 		outcome = [] # action_list game(reference)
@@ -95,8 +97,6 @@ class Strategy_node():
 		for [action, strategy] in self.substrategies:
 			outcome += strategy.get_outcomes()
 		return outcome
-
-
 
 class AIAgent(DoNothingAgent):
 	def __init__(self, eta, explore_prob, discount, feature_extractor, learn = True):
