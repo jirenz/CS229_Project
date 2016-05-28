@@ -17,6 +17,7 @@ from projectfiles.agent import *
 from projectfiles.feature_extract import *
 from projectfiles.feature_extract_2 import *
 from projectfiles import *
+from learning.strategy import StrategyManager
 
 def test_strategy():
     generator = RandomDeckGenerator()
@@ -26,8 +27,8 @@ def test_strategy():
     game.pre_game()
     game.current_player = game.players[1]
     while not game.game_ended:
-        root = StrategyManager(game)
-        print("Number of outcomes: " + str(len(root.get_outcomes())) + '\n')
+        manager = StrategyManager(None)
+        print("Number of outcomes: " + str(len(manager(game))) + '\n')
         game.play_single_turn()
 
 

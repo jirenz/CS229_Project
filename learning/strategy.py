@@ -1,3 +1,43 @@
+from projectfiles.feature_extract import *
+from hearthbreaker.agents.basic_agents import *
+import collections
+import numpy as np
+from projectfiles.feature_extract import *
+
+
+
+class DoFixedThingsMachine(Agent):
+    def __init__(self, chosen_index, entity_index, target_index, minion_position_index = 0):
+        self.chosen_index = chosen_index
+        self.entity_index = entity_index
+        self.target_index = target_index
+        self.minion_position_index = minion_position_index
+
+    def do_card_check(self, cards):
+        return [True, True, True, True]
+
+    def do_turn(self, player):
+        if self.chosen_index == 0:
+            player.minions[self.entity_index].attack()
+        elif self.chosen_index == 1:
+            player.hero.attack()
+        elif self.chosen_index == 2:
+            player.game.play_card(player.hand[self.entity_index])
+        elif self.chosen_index == 3:
+            player.hero.power.use()
+
+    def choose_target(self, targets):
+        if self.target_index is not None:
+            return targets[self.target_index]
+        else:
+            return targets[random.randint(0, len(targets) - 1)]
+
+    def choose_index(self, card, player):
+        return self.minion_position_index
+
+    def choose_option(self, options, player):
+        return options[random.randint(0, len(options) - 1)]
+
 class GameHelper():
 	def __init__(self):
 		self.base = 314159
@@ -59,6 +99,7 @@ class GameHelper():
 
 class StrategyNode(GameHelper):
 	def __init__(self, game, state_set):
+		super().__init__()
 		self.generate_strategies(game, state_set)
 
 	def generate_strategies(self, game, state_set):
