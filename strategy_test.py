@@ -26,7 +26,7 @@ def test_strategy():
     game.pre_game()
     game.current_player = game.players[1]
     while not game.game_ended:
-        root = Strategy_node(game)
+        root = StrategyManager(game)
         print("Number of outcomes: " + str(len(root.get_outcomes())) + '\n')
         game.play_single_turn()
 
