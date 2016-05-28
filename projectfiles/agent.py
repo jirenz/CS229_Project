@@ -1,7 +1,10 @@
 from hearthbreaker.agents.basic_agents import *
 import collections
 import numpy as np
-import json
+from projectfiles.feature_extract import *
+
+base = 314159
+bigp = 1000000007;
 
 class DoFixedThingsMachine(Agent):
 	def __init__(self, chosen_index, entity_index, target_index, minion_position_index = 0):
@@ -42,6 +45,7 @@ class GameHelper():
 	def generate_actions(self, game):
 		player = game.current_player
 		if game.game_ended: return []
+
 		actions = []
 		enemy_targets = self.get_enemy_targets(player)
 		for i, attack_minion in filter(lambda p: p[1].can_attack(), enumerate(player.minions)):
@@ -55,8 +59,8 @@ class GameHelper():
 				actions += [(2, i, None)]
 		if player.hero.power.can_use():
 			actions += [(3, None, None)]
-		if len(actions) > 5:
-			print("action_size: " + str(len(actions)))
+		#if len(actions) > 5:
+		#	print("action_size: " + str(len(actions)))
 		return actions
 	
 	def get_enemy_targets(self, player):
@@ -77,37 +81,56 @@ class GameHelper():
 	def excecute(self, game, action):
 		machine = DoFixedThingsMachine(*action)
 		game.current_player.agent = machine
-		try:
-			machine.do_turn(game.current_player)
-		except Exception as e:
-			print(self.game_to_json(game))
+		machine.do_turn(game.current_player)
 		return game
+	
+	def hashgame(self,game):
+		player = game.current_player
+		state_list = feature_extractor(player)
+		ans = 1
+		for i in state_list:
+			ans = (ans * base + i ) % bigp;
+		return ans
+
 
 	def game_to_json(self, game):
 	 	return json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1)
+	 	
 
-class StrategyNode():
-	def __init__(self, game):
-		self.helper = GameHelper()
-		self.generate_strategies(game)
+class StrategyNode(GameHelper):
+	def __init__(self, game, state_set):
+		self.generate_strategies(game, state_set)
 
-	def generate_strategies(self, game):
-		self.game = game
-		self.substrategies = []
-		self.actions = self.helper.generate_actions(game)
-		for action in self.actions:
-			outcome = game.copy()
-			self.helper.excecute(outcome, action)
-			self.substrategies.append([action, StrategyNode(outcome)])
+	def generate_strategies(self, game, state_set):
+		game_hash = self.hashgame(game);
+		if not (game_hash in state_set):
+			state_set.add(game_hash)
+			self.game = game
+			self.substrategies = []
+			self.actions = self.generate_actions(game)
+			for action in self.actions:
+				outcome = game.copy()
+				self.excecute(outcome, action)
+				self.substrategies.append([action, StrategyNode(outcome, state_set)])
+		else:
+			self.game = None
+			# print("hash collision found!")
 
 	def get_outcomes(self):
+		if (self.game == None): return []
 		outcome = [] # action_list game(reference)
 		outcome.append(self.game)
 		for [action, strategy] in self.substrategies:
 			outcome += strategy.get_outcomes()
 		return outcome
 
-
+class StrategyManager():
+	def __init__(self, game):
+		self.store_state = set()
+		self.strategy_node = StrategyNode(game, self.store_state);
+	
+	def get_outcomes(self):
+		return self.strategy_node.get_outcomes()
 
 class AIAgent(DoNothingAgent):
 	def __init__(self, eta, explore_prob, discount, feature_extractor, learn = True):
@@ -165,7 +188,7 @@ class AIAgent(DoNothingAgent):
 				actions += [(2, i, None)]
 		if player.hero.power.can_use():
 			actions += [(3, None, None)]
-		print("action_size: " + str(len(actions)))
+		# print("action_size: " + str(len(actions)))
 		return actions
 
 	def decide(self, actions):
