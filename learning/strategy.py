@@ -59,9 +59,12 @@ class StrategyManager():
 		return self.get_outcomes()
 
 	# def getRandomAction(self, state):
-		# raise NotImplementedError("")
+		# outcome = state.copy()
+		# actions = GameHelper.generate_actions(outcome) + ["NO_ACTION"]
+		#for action in 
 
 	def getBestActions(self, state, heuristic, max_actions = 1):
+		self.think(state)
 		self.path = []
 		self.ans_path = [-10000, []]
 		self.root.get_optimal(self.path, heuristic, self.root.game, self.ans_path)
