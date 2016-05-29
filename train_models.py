@@ -19,4 +19,4 @@ if __name__ == "__main__":
 		explore_prob = 0.1,
 		function_approximator = model)
 
-	ql.train(1)
+	ql.train(2)
