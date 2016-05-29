@@ -4,6 +4,7 @@ import learning.mdp
 from projectfiles.random_deck_generator import RandomDeckGenerator
 from hearthbreaker.engine import Deck, card_lookup, Game
 from hearthbreaker.agents import *
+import projectfiles.util
 
 class HearthstoneMDP(learning.mdp.MDP):
 	def __init__(self, strategy):
@@ -23,7 +24,6 @@ class HearthstoneMDP(learning.mdp.MDP):
 		return state.game_ended
 
 	def getActions(self, state):
-		GameHelper.getActions(state)
 		# An "action" is actually parametrized directly by the state corresponding
 		# to the current player's actions. The strategy object enumerates a list of
 		# possible actions

@@ -1,6 +1,7 @@
 from projectfiles.util import GameHelper, FixedActionAgent
 import collections
 import numpy as np
+import random
 
 class StrategyNode():
 	def __init__(self, game, state_set):
@@ -10,6 +11,7 @@ class StrategyNode():
 	def generate_strategies(self, game, state_set):
 		game_hash = GameHelper.hashgame(game);
 		if not (game_hash in state_set):
+			self.visited = False
 			state_set.add(game_hash)
 			self.game = game
 			self.substrategies = []
@@ -19,26 +21,25 @@ class StrategyNode():
 				GameHelper.execute(outcome, action)
 				self.substrategies.append([action, StrategyNode(outcome, state_set)])
 		else:
-			self.game = None
+			self.visited = True
+			self.game = game
 
 	def get_outcomes(self):
-		if (self.game == None): return []
+		if self.visited: return []
 		outcome = [] # action_list game(reference)
 		outcome.append(self.game)
 		for [action, strategy] in self.substrategies:
 			outcome += strategy.get_outcomes()
 		return outcome
 
-	def get_optimal(self, path, approximator, original_state, ans_path):
-		if (self.game == None): return
+	def get_optimal(self, approximator, original_state, ans_path):
+		if self.visited: return
 		value = approximator(original_state, self.game)
 		if (value > ans_path[0]):
 			ans_path[0] = value
-			ans_path[1] = path
+			ans_path[1] = self.game
 		for [action, strategy] in self.substrategies:
-			path.append(strategy)
-			strategy.get_optimal(path, approximator, original_state, ans_path)
-			path.pop(-1)
+			strategy.get_optimal(approximator, original_state, ans_path)
 
 class StrategyManager():
 	def __init__(self, function_approximator):
@@ -57,14 +58,22 @@ class StrategyManager():
 		self.think(state)
 		return self.get_outcomes()
 
-	# def getRandomAction(self, state):
-		# outcome = state.copy()
-		# actions = GameHelper.generate_actions(outcome) + ["NO_ACTION"]
-		#for action in 
+	def getRandomAction(self, state):
+		outcome = state.copy()
+		while True:
+			actions = GameHelper.generate_actions(outcome) + ["NO_ACTION"]
+			if len(actions) == 0:
+				break
+
+			action = random.choice(actions)
+			if action == "NO_ACTION":
+				break
+			else:
+				outcome = GameHelper.execute(outcome, action)
+		return outcome
 
 	def getBestActions(self, state, heuristic, max_actions = 1):
 		self.think(state)
-		self.path = []
-		self.ans_path = [-10000, []]
-		self.root.get_optimal(self.path, heuristic, self.root.game, self.ans_path)
-		return self.ans_path
+		self.ans_pair = [-10000, None]
+		self.root.get_optimal(heuristic, self.root.game, self.ans_pair)
+		return self.ans_pair[1]

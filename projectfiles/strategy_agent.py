@@ -15,7 +15,7 @@ class StrategyAgent(DoNothingAgent):
 		game = player.game
 		action = self.decide(game)
 		if action:
-			GameHelper.excecute(game, action)
+			GameHelper.execute(game, action)
 		else: 
 			return
 
