@@ -41,12 +41,9 @@ def test_agent_once(one, other = None):
 	new_game = game.copy()
 	try:
 		new_game.start()
-		# print("Game ended?: " + str(new_game.game_ended))
-		# new_game.start()
 	except Exception as e:
 		print("Game error" + str(e))
 		#print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
-		#print(new_game._all_cards_played)
 		del new_game
 		return False
 	print("winning agent: " + new_game.winner.agent.__class__.__name__)

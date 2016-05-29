@@ -16,6 +16,7 @@ class StrategyAgent(DoNothingAgent):
 		while True:
 			action = self.decide(game)
 			GameHelper.execute(game, action)
+			print("Me: " + str(player.hero.health) + " Him: " + str(game.other_player.hero.health))
 			if action == "No_Action":
 				return
 
@@ -44,4 +45,4 @@ class StrategyAgent(DoNothingAgent):
 			if new_value > max_value:
 				max_value = new_value
 				max_action = action
-		return action
+		return max_action
