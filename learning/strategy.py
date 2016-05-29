@@ -61,11 +61,11 @@ class StrategyManager():
 	def getRandomAction(self, state):
 		outcome = state.copy()
 		while True:
-			actions = GameHelper.generate_actions(outcome) + ["NO_ACTION"]
+			actions = GameHelper.generate_actions(outcome)
 			if len(actions) == 0:
 				break
 
-			action = random.choice(actions)
+			action = random.choice(actions) + ["NO_ACTION"]
 			if action == "NO_ACTION":
 				break
 			else:
