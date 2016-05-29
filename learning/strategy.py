@@ -79,9 +79,12 @@ class GameHelper():
         return targets
 
     def excecute(self, game, action):
+        hero_1 = game.other_player.hero.__to_json__()
         machine = DoFixedThingsMachine(*action)
         game.current_player.agent = machine
         machine.do_turn(game.current_player)
+        hero_2 = game.other_player.hero.__to_json__()
+        print("1: " + str(hero_1) + '\n' + "2: " + str(hero_2) + '\n')
         return game
 
     def hashgame(self,game):
