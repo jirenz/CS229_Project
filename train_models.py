@@ -9,7 +9,7 @@ import numpy as np
 from projectfiles.agent import *
 
 if __name__ == "__main__":
-	model = FinalStateLinearModel(feature_extractor_2_initial(), feature_extractor_2_temporary)
+	model = StatePairLinearModel(feature_extractor_2_initial(), feature_extractor_2_temporary)
 
 	full_stage_strategy = StrategyManager(model)
 	training_mdp = HearthstoneMDP(full_stage_strategy)
