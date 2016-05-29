@@ -124,13 +124,14 @@ class StrategyNode(GameHelper):
         return outcome
 
     def get_optimal(self, path, approximator, original_state, ans_path):
+        if (self.game == None): return
         value = approximator(original_state, self.game)
         if (value > ans_path[0]):
             ans_path[0] = value
             ans_path[1] = path
         for [action, strategy] in self.substrategies:
             path.append(strategy)
-            get_optimal(path, approximator, original_state, ans_path);
+            strategy.get_optimal(path, approximator, original_state, ans_path)
             path = path[0:-1]
 
 class StrategyManager():
@@ -140,11 +141,11 @@ class StrategyManager():
         pass
 
     def best_action_list(self):
-        self.path = [];
+        self.path = []
         self.ans_path = [-10000, []]
         self.root.get_optimal(self.path, self.approximator, self.root.game, self.ans_path)
-        print(ans_path)
-        return ans_path
+        #print(self.ans_path)
+        return self.ans_path
 
     def get_outcomes(self):
         return self.root.get_outcomes()
