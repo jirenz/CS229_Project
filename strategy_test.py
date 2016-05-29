@@ -18,6 +18,7 @@ from projectfiles.feature_extract import *
 from projectfiles.feature_extract_2 import *
 from projectfiles import *
 from learning.strategy import StrategyManager
+from learning.model import *
 
 def test_strategy():
     generator = RandomDeckGenerator()
@@ -27,8 +28,10 @@ def test_strategy():
     game.pre_game()
     game.current_player = game.players[1]
     while not game.game_ended:
-        manager = StrategyManager(None)
-        print("Number of outcomes: " + str(len(manager.get_outcomes(game))) + '\n')
+        manager = StrategyManager(StatePairLinearModel(feature_extractor_2_initial(), feature_extractor_2_temporary))
+        manager.think(game)
+        print("Number of outcomes: " + str(len(manager.get_outcomes())) + '\n')
+        print("Best Action List: " + str(len(manager.best_action_list())) + '\n')
         game.play_single_turn()
 
 

@@ -89,7 +89,7 @@ class GameHelper():
         state_list = feature_extractor(player)
         ans = 1
         for i in state_list:
-            ans = (ans * self.base + i ) % self.bigp;
+            ans = (ans * self.base + i ) % self.bigp
         return ans
 
     def game_to_json(self, game):
@@ -123,8 +123,16 @@ class StrategyNode(GameHelper):
             outcome += strategy.get_outcomes()
         return outcome
 
-    def get_optimal(self, path, approximator, original_state):
+    def get_optimal(self, path, approximator, original_state, ans_path):
+        if (self.game == None): return
         value = approximator(original_state, self.game)
+        if (value > ans_path[0]):
+            ans_path[0] = value
+            ans_path[1] = path
+        for [action, strategy] in self.substrategies:
+            path.append(strategy)
+            strategy.get_optimal(path, approximator, original_state, ans_path)
+            path = path[0:-1]
 
 class StrategyManager():
     def __init__(self, function_approximator):
@@ -133,10 +141,13 @@ class StrategyManager():
         pass
 
     def best_action_list(self):
-        self.path = [];
-        root.get_optimal(self.path, self.approximator, self.root.game)
+        self.path = []
+        self.ans_path = [-10000, []]
+        self.root.get_optimal(self.path, self.approximator, self.root.game, self.ans_path)
+        #print(self.ans_path)
+        return self.ans_path
 
-    def get_outcomes(self, state):
+    def get_outcomes(self):
         return self.root.get_outcomes()
 
     def think(self, state):

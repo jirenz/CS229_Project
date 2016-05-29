@@ -3,8 +3,6 @@ import collections
 import numpy as np
 from projectfiles.feature_extract import *
 
-
-
 class AIAgent(DoNothingAgent):
 	def __init__(self, eta, explore_prob, discount, feature_extractor, learn = True):
 		super().__init__()
