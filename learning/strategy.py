@@ -20,7 +20,6 @@ class StrategyNode():
 				self.substrategies.append([action, StrategyNode(outcome, state_set)])
 		else:
 			self.game = None
-			# print("hash collision found!")
 
 	def get_outcomes(self):
 		if (self.game == None): return []
@@ -39,7 +38,7 @@ class StrategyNode():
 		for [action, strategy] in self.substrategies:
 			path.append(strategy)
 			strategy.get_optimal(path, approximator, original_state, ans_path)
-			path = path[0:-1]
+			path.pop(-1)
 
 class StrategyManager():
 	def __init__(self, function_approximator):
