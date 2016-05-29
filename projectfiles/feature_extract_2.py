@@ -68,3 +68,9 @@ def feature_extractor_2(game, next_game, action):
 	del next_game
 	# print(feat)
 	return np.array(list(feat.values()), dtype=np.float64)
+
+def feature_extractor_2_temporary(state, next_state):
+	return feature_extractor_2(state, next_state, None)
+
+def feature_extractor_2_initial():
+	return np.zeros((91, ))

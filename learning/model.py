@@ -1,16 +1,15 @@
 import numpy as np
-import learning.mdp.MDP
+import learning.mdp
 
 from projectfiles.random_deck_generator import RandomDeckGenerator
 from hearthbreaker.engine import Deck, card_lookup, Game
+from hearthbreaker.agents import *
 
-from learning.strategy import 
-
-class HearthstoneMDP(learning.mdp.MDP)
+class HearthstoneMDP(learning.mdp.MDP):
 	def __init__(self, strategy):
 		self.strategy = strategy
 	
-	def start_state():
+	def start_state(self):
 		generator = RandomDeckGenerator()
 		deck1 = generator.generate()
 		deck2 = deck1.copy()
@@ -20,27 +19,33 @@ class HearthstoneMDP(learning.mdp.MDP)
 		game.current_player = game.players[0]
 		return game
 
-	def is_end_state():
-		return game.game_ended
+	def is_end_state(self, state):
+		return state.game_ended
 
 	def getActions(self, state):
 		# An "action" is actually parametrized directly by the state corresponding
 		# to the current player's actions. The strategy object enumerates a list of
 		# possible actions
-		state._start_turn()
-		return self.strategy(state)
+		new_state = state.copy()
+		new_state._start_turn()
+		actions = self.strategy(new_state)
+		for a in actions:
+			if new_state.current_player.name != a.current_player.name:
+				print("OMG", new_state.current_player, a.current_player)
+		return actions
 
 	def getSuccAndReward(self, state, next_action):
 		next_state = next_action.copy()
 		next_state._end_turn()
 
+		reward = 0.0
 		if next_state.game_ended:
-			if state.current_player == next_state.winner:
-				reward = self.getReward("win")
-			elif state.current_player.opponent == next_state.winner:
-				reward = self.getReward("lose")
-			else:
+			if next_state.winner is None:
 				reward = self.getReward("tie")
+			elif state.current_player.name == next_state.winner.name:
+				reward = self.getReward("win")
+			else:
+				reward = self.getReward("lose")
 
 		return (next_state, reward)
 
@@ -50,7 +55,7 @@ class HearthstoneMDP(learning.mdp.MDP)
 	def getDiscount(self):
 		return 0.9 #?
 
-def StatePairLinearModel:
+class StatePairLinearModel:
 	# Takes a feature extractor that expects TWO state arguments
 	def __init__(self, initial_weights, feature_extractor):
 		self.weights = initial_weights
@@ -72,7 +77,7 @@ def StatePairLinearModel:
 		self.weights += delta * oldPhi
 		self.weights /= np.sqrt(np.dot(self.weights, self.weights)) + 1e-6
 
-def SimulatingStatePairLinearModel(StatePairLinearModel):
+class SimulatingStatePairLinearModel(StatePairLinearModel):
 	# Takes a feature extractor that expects TWO state arguments
 	def __init__(self, initial_weights, feature_extractor):
 		super().__init__(initial_weights, feature_extractor)
@@ -101,7 +106,7 @@ def SimulatingStatePairLinearModel(StatePairLinearModel):
 
 		return super().eval(state, next_state)
 
-def FinalStateLinearModel:
+class FinalStateLinearModel:
 	# Takes a feature extractor that expects ONE state argument
 	def __init__(self, initial_weights, feature_extractor):
 		self.weights = initial_weights
@@ -110,10 +115,13 @@ def FinalStateLinearModel:
 	def __call__(self, state, action):
 		# the action is a state!
 		next_state = action.copy()
+		if next_state.current_player.name != state.current_player.name:
+			print("OMG", next_state.current_player.name, state.current_player.name)
+		assert(next_state.current_player.name == state.current_player.name)
 		next_state._end_turn()
-		assert(next_state.current_player == state.current_player)
+		assert(next_state.current_player.name == state.current_player.name)
 
-		return self.eval(next_state)
+		return self.eval(state, next_state)
 
 	def eval(self, state, next_state):
 		return np.dot(self.weights, self.feature_extractor(next_state))
@@ -123,7 +131,7 @@ def FinalStateLinearModel:
 		self.weights += delta * oldPhi
 		self.weights /= np.sqrt(np.dot(self.weights, self.weights)) + 1e-6
 
-def TreeSearchFinalStateLinearModel(FinalStateLinearModel):
+class TreeSearchFinalStateLinearModel(FinalStateLinearModel):
 	# Takes a feature extractor that expects ONE state argument
 	def __init__(self, initial_weights, feature_extractor):
 		self.weights = initial_weights

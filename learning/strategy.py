@@ -152,3 +152,7 @@ class StrategyManager():
     def think(self, state):
         self.store_state = set()
         self.root = StrategyNode(state, self.store_state)
+
+    def __call__(self, state):
+        self.think(state)
+        return self.get_outcomes(state)
