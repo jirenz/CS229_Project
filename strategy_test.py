@@ -30,10 +30,13 @@ def test_strategy():
     while not game.game_ended:
         manager = StrategyManager(StatePairLinearModel(feature_extractor_2_initial(), feature_extractor_2_temporary))
         manager.think(game)
-        print("Number of outcomes: " + str(len(manager.get_outcomes())) + '\n')
+        outcomes = manager.get_outcomes()
+        print("Number of outcomes: " + str(len(outcomes)) + '\n')
+        for situation in outcomes:
+            print("See: " + str(situation.other_player.hero.__to_json__()) + '\n')
+        input("Presss enter to continue:")
+
         game.play_single_turn()
-
-
 
 if __name__ == "__main__":
     for i in range(10):

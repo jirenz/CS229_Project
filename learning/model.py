@@ -26,12 +26,7 @@ class HearthstoneMDP(learning.mdp.MDP):
 		# An "action" is actually parametrized directly by the state corresponding
 		# to the current player's actions. The strategy object enumerates a list of
 		# possible actions
-		new_state = state.copy()
-		actions = self.strategy(new_state)
-		for a in actions:
-			if new_state.current_player.name != a.current_player.name:
-				print("OMG", new_state.current_player, a.current_player)
-		return actions
+		return self.strategy(state.copy())
 
 	def getSuccAndReward(self, state, next_action):
 		next_state = next_action.copy()
@@ -62,8 +57,6 @@ class StatePairLinearModel:
 	def __call__(self, state, action):
 		# the action is a state!
 		next_state = action
-		#next_state._end_turn()
-		#assert(next_state.current_player == state.current_player)
 
 		return self.eval(state, next_state)
 
@@ -112,13 +105,7 @@ class FinalStateLinearModel:
 
 	def __call__(self, state, action):
 		# the action is a state!
-		next_state = action.copy()
-		if next_state.current_player.name != state.current_player.name:
-			print("OMG", next_state.current_player.name, state.current_player.name)
-		assert(next_state.current_player.name == state.current_player.name)
-		next_state._end_turn()
-		assert(next_state.current_player.name == state.current_player.name)
-
+		next_state = action
 		return self.eval(state, next_state)
 
 	def eval(self, state, next_state):
@@ -137,10 +124,7 @@ class TreeSearchFinalStateLinearModel(FinalStateLinearModel):
 
 	def __call__(self, state, action):
 		# the action is a state!
-		next_state = action.copy()
+		next_state = action
 
 		# DO SOME TREE SEARCH HERE
-		next_state._end_turn()
-		assert(next_state.current_player == state.current_player)
-
 		return self.eval(state, next_state)
