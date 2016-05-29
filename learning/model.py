@@ -27,7 +27,6 @@ class HearthstoneMDP(learning.mdp.MDP):
 		# to the current player's actions. The strategy object enumerates a list of
 		# possible actions
 		new_state = state.copy()
-		new_state._start_turn()
 		actions = self.strategy(new_state)
 		for a in actions:
 			if new_state.current_player.name != a.current_player.name:
@@ -36,7 +35,6 @@ class HearthstoneMDP(learning.mdp.MDP):
 
 	def getSuccAndReward(self, state, next_action):
 		next_state = next_action.copy()
-		next_state._end_turn()
 
 		reward = 0.0
 		if next_state.game_ended:
@@ -63,9 +61,9 @@ class StatePairLinearModel:
 
 	def __call__(self, state, action):
 		# the action is a state!
-		next_state = action.copy()
-		next_state._end_turn()
-		assert(next_state.current_player == state.current_player)
+		next_state = action
+		#next_state._end_turn()
+		#assert(next_state.current_player == state.current_player)
 
 		return self.eval(state, next_state)
 
@@ -74,7 +72,7 @@ class StatePairLinearModel:
 
 	def update(self, state, next_state, delta):
 		phi = self.feature_extractor(state, next_state)
-		self.weights += delta * oldPhi
+		self.weights += delta * phi
 		self.weights /= np.sqrt(np.dot(self.weights, self.weights)) + 1e-6
 
 class SimulatingStatePairLinearModel(StatePairLinearModel):
@@ -121,14 +119,14 @@ class FinalStateLinearModel:
 		next_state._end_turn()
 		assert(next_state.current_player.name == state.current_player.name)
 
-		return self.eval(next_state)
+		return self.eval(state, next_state)
 
 	def eval(self, state, next_state):
 		return np.dot(self.weights, self.feature_extractor(next_state))
 
 	def update(self, state, next_state, delta):
 		phi = self.feature_extractor(next_state)
-		self.weights += delta * oldPhi
+		self.weights += delta * phi
 		self.weights /= np.sqrt(np.dot(self.weights, self.weights)) + 1e-6
 
 class TreeSearchFinalStateLinearModel(FinalStateLinearModel):
