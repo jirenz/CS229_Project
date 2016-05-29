@@ -27,7 +27,6 @@ class QLearningAlgorithm:
             while not self.mdp.is_end_state(state):
                 state._start_turn()
 
-
                 print("current state", state.current_player.name, turns)
                 print(state.current_player.hero.__to_json__())
                 if random.random() < self.explore_prob:
