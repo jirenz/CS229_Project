@@ -17,7 +17,10 @@ from projectfiles.agent import *
 from projectfiles.feature_extract import *
 from projectfiles.feature_extract_2 import *
 
-from sparklines import sparklines
+# from sparklines import sparklines
+
+from projectfiles.strategy_agent import *
+from learning.function_approximator import *
 
 def spark_weights(weights):
 	W = weights - np.min(weights)
@@ -25,7 +28,8 @@ def spark_weights(weights):
 	#for line in sparklines(list(W), num_lines = 3):
 	#	print(line)
 
-def test_agent_once(ql, other = None):
+def test_agent_once(one, other = None):
+	print("game_started")
 	generator = RandomDeckGenerator()
 	deck1 = generator.generate()
 	deck2 = deck1.copy()
@@ -33,39 +37,52 @@ def test_agent_once(ql, other = None):
 	if other is None:
 		other = TradeAgent()
 		#other = RandomAgent()
-	game = Game([deck1, deck2], [ql, other])
+	game = Game([deck1, deck2], [one, other])
 	# game = Game([deck1, deck2], [TradeAgent(), RandomAgent()])
 	new_game = game.copy()
 	try:
 		new_game.start()
+		print("Game ended?: " + str(new_game.game_ended))
 		# new_game.start()
 	except Exception as e:
+		print("Game error" + str(e))
+		# print(str(e))
 		#print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
 		#print(new_game._all_cards_played)
 		del new_game
+		# raise
 		return False
 	print("winning agent: " + new_game.winner.agent.__class__.__name__)
-	spark_weights(ql.weights)
+	# spark_weights(ql.weights)
 	return new_game.winner.agent.__class__.__name__
 
-def run_agent(ql, other, number):
+def run_agent(one, other, number):
 	i = 0
+	err = 0
 	winning_count = {}
 	while i < number:
-		winner = test_agent_once(ql, other)
+		winner = test_agent_once(one, other)
 		if winner:
 			i += 1
 			if winner in winning_count:
 				winning_count[winner] += 1
 			else:
 				winning_count[winner] = 1
+		else:
+			print("Error")
+			err += 1
+			if err > 5:
+				print("Aborting after 5 errors.")
+				break
 	print(winning_count)
 
 
 if __name__ == "__main__":
-	ql = AIAgent(eta = 0.001, explore_prob = 0.1, discount = 0.5, feature_extractor = feature_extractor_2)
-	run_agent(ql, ql, int(sys.argv[1]))
+	# ql = AIAgent(eta = 0.001, explore_prob = 0.1, discount = 0.5, feature_extractor = feature_extractor_2)
+	# run_agent(ql, ql, int(sys.argv[1]))
 
-	ql.explore_prob = 0.0
-	ql.learn = False
-	run_agent(ql, None, int(sys.argv[2]))
+	# ql.explore_prob = 0.0
+	# ql.learn = False
+	# run_agent(ql, None, int(sys.argv[2]))
+	run_agent(RandomAgent(), StrategyAgent(BasicFunctionApproximator()), int(sys.argv[1]))
+	# ,

@@ -2,7 +2,6 @@ from projectfiles.feature_extract import *
 from hearthbreaker.agents.basic_agents import *
 import collections
 import numpy as np
-from projectfiles.feature_extract import *
 
 class DoFixedThingsMachine(Agent):
     def __init__(self, chosen_index, entity_index, target_index, minion_position_index = 0):
@@ -45,7 +44,6 @@ class GameHelper():
     def generate_actions(self, game):
         player = game.current_player
         if game.game_ended: return []
-
         actions = []
         enemy_targets = self.get_enemy_targets(player)
         for i, attack_minion in filter(lambda p: p[1].can_attack(), enumerate(player.minions)):
@@ -79,13 +77,21 @@ class GameHelper():
         return targets
 
     def excecute(self, game, action):
-        hero_1 = game.other_player.hero.__to_json__()
-        machine = DoFixedThingsMachine(*action)
-        game.current_player.agent = machine
-        machine.do_turn(game.current_player)
-        hero_2 = game.other_player.hero.__to_json__()
-        print("1: " + str(hero_1) + '\n' + "2: " + str(hero_2) + '\n')
-        return game
+        try:
+            # hero_1 = game.other_player.hero.__to_json__()
+            machine = DoFixedThingsMachine(*action)
+            agent = game.current_player.agent
+            game.current_player.agent = machine
+            machine.do_turn(game.current_player)
+            game.current_player.agent = agent
+            return True
+            # hero_2 = game.other_player.hero.__to_json__()
+            # print("1: " + str(hero_1) + '\n' + "2: " + str(hero_2) + '\n')
+        except Exception as e:
+            print("Excecution error:" + str(e))
+            # raise e
+            # raise e # change later
+            return False
 
     def hashgame(self,game):
         player = game.current_player
@@ -99,8 +105,9 @@ class GameHelper():
         return json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1)
 
 class StrategyNode(GameHelper):
-    def __init__(self, game, state_set):
+    def __init__(self, game, state_set, depth):
         super().__init__()
+        self.depth = depth
         self.generate_strategies(game, state_set)
 
     def generate_strategies(self, game, state_set):
@@ -113,7 +120,7 @@ class StrategyNode(GameHelper):
             for action in self.actions:
                 outcome = game.copy()
                 self.excecute(outcome, action)
-                self.substrategies.append([action, StrategyNode(outcome, state_set)])
+                self.substrategies.append([action, StrategyNode(outcome, state_set, self.depth + 1)])
         else:
             self.game = None
             # print("hash collision found!")
@@ -133,7 +140,8 @@ class StrategyNode(GameHelper):
             ans_path[0] = value
             ans_path[1] = path
         for [action, strategy] in self.substrategies:
-            path.append(strategy)
+            # path.append(strategy)
+            path.append(action)
             strategy.get_optimal(path, approximator, original_state, ans_path)
             path = path[0:-1]
 
@@ -141,7 +149,11 @@ class StrategyManager():
     def __init__(self, function_approximator):
         self.approximator = function_approximator
         # self.approximator(state, next_state) => value
-        pass
+    
+    def clear(self):
+        self.path = []
+        self.root = None
+        self.store_state = None
 
     def best_action_list(self):
         self.path = []
@@ -155,7 +167,7 @@ class StrategyManager():
 
     def think(self, state):
         self.store_state = set()
-        self.root = StrategyNode(state, self.store_state)
+        self.root = StrategyNode(state, self.store_state, 0)
 
     def __call__(self, state):
         self.think(state)

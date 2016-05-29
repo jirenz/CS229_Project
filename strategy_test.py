@@ -32,9 +32,9 @@ def test_strategy():
         manager.think(game)
         outcomes = manager.get_outcomes()
         print("Number of outcomes: " + str(len(outcomes)) + '\n')
-        for situation in outcomes:
-            print("See: " + str(situation.other_player.hero.__to_json__()) + '\n')
-        input("Presss enter to continue:")
+        # for situation in outcomes:
+        #     print("See: " + str(situation.other_player.hero.__to_json__()) + '\n')
+        # input("Presss enter to continue:")
 
         # print("Best Action List: " + str(len(manager.best_action_list())) + '\n')
         game.play_single_turn()
