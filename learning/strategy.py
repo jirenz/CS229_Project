@@ -134,7 +134,7 @@ class StrategyManager():
 
     def best_action_list(self):
         self.path = [];
-        root.get_optimal(self.path, self.approximator, root.game)
+        root.get_optimal(self.path, self.approximator, self.root.game)
 
     def get_outcomes(self, state):
         return self.root.get_outcomes()
@@ -142,3 +142,7 @@ class StrategyManager():
     def think(self, state):
         self.store_state = set()
         self.root = StrategyNode(state, self.store_state)
+
+    def __call__(self, state):
+        self.think(state)
+        return self.get_outcomes(state)
