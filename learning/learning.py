@@ -27,13 +27,13 @@ class QLearningAlgorithm:
             while not self.mdp.is_end_state(state):
                 state._start_turn()
 
+
                 print("current state", state.current_player.name, turns)
                 print(state.current_player.hero.__to_json__())
                 if random.random() < self.explore_prob:
                     next_action = random.choice(self.mdp.getActions(state))
                 else:
                     next_action = self.getQPolicy(state)
-
 
                 next_state, reward = self.mdp.getSuccAndReward(state, next_action)
                 self.F.update(state, next_action, \
