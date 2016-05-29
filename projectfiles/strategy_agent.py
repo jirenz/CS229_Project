@@ -21,16 +21,16 @@ class StrategyAgent(DoNothingAgent):
 				return
 
 	def choose_target(self, targets):
-		raise
+		raise Exception("asked to choose target")
 		return
 		# return self.machine.choose_target(targets)
 
 	def choose_index(self, card, player):
-		raise
+		raise Exception("asked to choose index")
 		return # self.machine.choose_index(card, player)
 
 	def choose_option(self, options, player):
-		raise
+		raise Exception("asked to choose option")
 		# options = self.filter_options(options, player)
 		return # self.machine.choose_option(options, player)
 

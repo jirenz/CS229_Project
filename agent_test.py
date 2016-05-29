@@ -42,7 +42,7 @@ def test_agent_once(one, other = None):
 	try:
 		new_game.start()
 	except Exception as e:
-		print("Game error" + str(e))
+		print("Game error: " + str(e))
 		#print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
 		del new_game
 		return False
@@ -78,5 +78,5 @@ if __name__ == "__main__":
 	# ql.explore_prob = 0.0
 	# ql.learn = False
 	# run_agent(ql, None, int(sys.argv[2]))
-	run_agent(RandomAgent(), StrategyAgent(), int(sys.argv[1]))
+	run_agent(TradeAgent(), StrategyAgent(), int(sys.argv[1]))
 	# ,
