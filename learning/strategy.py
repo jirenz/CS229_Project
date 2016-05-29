@@ -156,4 +156,5 @@ class StrategyManager():
 
     def __call__(self, state):
         self.think(state)
-        return self.get_outcomes(state)
+        # TODO: get_outcomes() return list of actions for learning; should be refined
+        return self.get_outcomes()

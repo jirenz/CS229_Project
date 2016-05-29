@@ -31,7 +31,6 @@ def test_strategy():
         manager = StrategyManager(StatePairLinearModel(feature_extractor_2_initial(), feature_extractor_2_temporary))
         manager.think(game)
         print("Number of outcomes: " + str(len(manager.get_outcomes())) + '\n')
-        print("Best Action List: " + str(len(manager.best_action_list())) + '\n')
         game.play_single_turn()
 
 
