@@ -69,7 +69,7 @@ class StrategyManager():
 			if action == "NO_ACTION":
 				break
 			else:
-				outcome = GameHelper.execute(outcome, action)
+				GameHelper.execute(outcome, action)
 		return outcome
 
 	def getBestActions(self, state, heuristic, max_actions = 1):

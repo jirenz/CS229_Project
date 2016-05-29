@@ -19,6 +19,15 @@ class QLearningAlgorithm:
 		maxQ = max(Q for Q, action in actions)
 		return random.choice(list(filter(lambda x: abs(x[0] - maxQ) < 1e-5, actions)))[1]
 
+	def epsilonGreedy(self, state):
+		if random.random() < self.explore_prob:
+			print("get random action")
+			# next_action = random.choice(self.mdp.getActions(state))
+			return self.mdp.getRandomAction(state)
+		else:
+			print("get best action")
+			return self.mdp.getBestActions(state, self.getQ)
+
 	def train(self, epochs = 10):
 		for epoch in range(epochs):
 			state = self.mdp.start_state()
@@ -29,12 +38,8 @@ class QLearningAlgorithm:
 
 				print("current state", state.current_player.name, turns)
 				print(state.current_player.hero.__to_json__())
-				if random.random() < self.explore_prob:
-					# next_action = random.choice(self.mdp.getActions(state))
-					next_action = self.mdp.getRandomAction(state)
-				else:
-					next_action = self.mdp.getBestActions(state, self.getQ)[0]
 
+				next_action = self.epsilonGreedy(state)
 				next_state, reward = self.mdp.getSuccAndReward(state, next_action)
 				self.F.update(state, next_action, \
 						reward + self.mdp.getDiscount() * self.getV(next_state))
@@ -65,11 +70,7 @@ class ExperienceReplayQ(QLearningAlgorithm):
 			history = []
 
 			while not self.mdp.is_end_state(state):
-				if random.random() < self.explore_prob:
-					next_action = random.choice(self.mdp.getActions(state))
-				else:
-					next_action = self.getQPolicy(state)
-
+				next_action = self.epsilonGreedy(state)
 				history.append((state, next_action))
 
 				next_state, _ = self.mdp.getSuccAndReward(state, next_action)
