@@ -1,9 +1,10 @@
+import random
+
 class QLearningAlgorithm:
-	def __init__(self, mdp, eta, explore_prob, rewards, function_approximator):
+	def __init__(self, mdp, eta, explore_prob, function_approximator):
 		self.mdp = mdp
 		self.eta = eta
 		self.explore_prob = explore_prob
-		self.rewards = rewards
 		self.F = function_approximator
 
 	def getQ(self, state, action):
@@ -20,10 +21,11 @@ class QLearningAlgorithm:
 			state = self.mdp.start_state()
 
 			while not self.mdp.is_end_state(state):
+				print("current state", state.current_player.name)
 				if random.random() < self.explore_prob:
-					next_action = random.choice(self.getActions(state))
+					next_action = random.choice(self.mdp.getActions(state))
 				else:
-					next_action = self.mdp.getQPolicy(state)
+					next_action = self.getQPolicy(state)
 
 				next_state, reward = self.mdp.getSuccAndReward(state, next_action)
 				self.F.update(state, next_action, \
@@ -34,7 +36,7 @@ class QLearningAlgorithm:
 class ExperienceReplayQ(QLearningAlgorithm):
 	def __init__(self, mdp, eta, explore_prob, rewards, function_approximator,
 					experience_size = 1000,
-					replay_size = 100
+					replay_size = 100,
 					replays_per_epoch = 1):
 		super().__init__(mdp, eta, explore_prob, rewards, function_approximator)
 		self.experience_size = experience_size
@@ -51,9 +53,9 @@ class ExperienceReplayQ(QLearningAlgorithm):
 
 			while not self.mdp.is_end_state(state):
 				if random.random() < self.explore_prob:
-					next_action = random.choice(self.getActions(state))
+					next_action = random.choice(self.mdp.getActions(state))
 				else:
-					next_action = self.mdp.getQPolicy(state)
+					next_action = self.getQPolicy(state)
 
 				history.append((state, next_action))
 
