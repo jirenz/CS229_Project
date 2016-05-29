@@ -1,6 +1,9 @@
 import random
 import json
 
+import numpy as np
+from sparklines import sparklines
+
 class QLearningAlgorithm:
 	def __init__(self, mdp, eta, explore_prob, function_approximator):
 		self.mdp = mdp
@@ -12,12 +15,14 @@ class QLearningAlgorithm:
 		return self.F(state, action)
 
 	def getV(self, state):
-		return max(self.getQ(state, action) for action in self.mdp.getActions(state))
+		return self.getQ(state, self.mdp.getBestAction(state, self.getQ))
+		# return max(self.getQ(state, action) for action in self.mdp.getActions(state))
 
-	def getQPolicy(self, state):
-		actions = [(self.getQ(state, action), action) for action in self.mdp.getActions(state)]
-		maxQ = max(Q for Q, action in actions)
-		return random.choice(list(filter(lambda x: abs(x[0] - maxQ) < 1e-5, actions)))[1]
+	def spark_weights(weights):
+		W = weights - np.min(weights)
+		W = W * 30 / (np.max(W) + 1e-6)
+		for line in sparklines(list(W), num_lines = 3):
+			print(line)
 
 	def epsilonGreedy(self, state):
 		if random.random() < self.explore_prob:
@@ -26,7 +31,7 @@ class QLearningAlgorithm:
 			return self.mdp.getRandomAction(state)
 		else:
 			print("get best action")
-			return self.mdp.getBestActions(state, self.getQ)
+			return self.mdp.getBestAction(state, self.getQ)
 
 	def train(self, epochs = 10):
 		for epoch in range(epochs):
@@ -40,11 +45,14 @@ class QLearningAlgorithm:
 				print(state.current_player.hero.__to_json__())
 
 				next_action = self.epsilonGreedy(state)
+				print("getting reward")
 				next_state, reward = self.mdp.getSuccAndReward(state, next_action)
+				print("update")
 				self.F.update(state, next_action, \
 						reward + self.mdp.getDiscount() * self.getV(next_state))
-
-				print(self.F.weights)
+				
+				#print(self.F.weights)
+				QLearningAlgorithm.spark_weights(self.F.weights)
 
 				next_state._end_turn()
 				print(next_state.current_player.hero.__to_json__())

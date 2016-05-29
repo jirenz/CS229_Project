@@ -23,7 +23,7 @@ class HearthstoneMDP(learning.mdp.MDP):
 	def is_end_state(self, state):
 		return state.game_ended
 
-	def getActions(self, state):
+	def getActions(self, state, max_actions = 10):
 		# An "action" is actually parametrized directly by the state corresponding
 		# to the current player's actions. The strategy object enumerates a list of
 		# possible actions
@@ -32,8 +32,8 @@ class HearthstoneMDP(learning.mdp.MDP):
 	def getRandomAction(self, state):
 		return self.strategy.getRandomAction(state.copy())
 
-	def getBestActions(self, state, heuristic, max_actions = 1):
-		return self.strategy.getBestActions(state.copy(), heuristic, max_actions)
+	def getBestAction(self, state, heuristic):
+		return self.strategy.getBestAction(state.copy(), heuristic)
 
 	def getSuccAndReward(self, state, next_action):
 		next_state = next_action.copy()

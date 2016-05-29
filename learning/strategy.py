@@ -3,6 +3,8 @@ import collections
 import numpy as np
 import random
 
+import Queue
+
 class StrategyNode():
 	def __init__(self, game, state_set):
 		super().__init__()
@@ -54,25 +56,30 @@ class StrategyManager():
 		self.store_state = set()
 		self.root = StrategyNode(state, self.store_state)
 
-	def getActions(self, state):
+	def getActions(self, state, max_actions = 10):
 		self.think(state)
 		return self.get_outcomes()
 
 	def getRandomAction(self, state):
 		outcome = state.copy()
 		while True:
-			actions = GameHelper.generate_actions(outcome) + ["NO_ACTION"]
+			actions = GameHelper.generate_actions(outcome)
 			if len(actions) == 0:
 				break
 
-			action = random.choice(actions)
+			print(actions)
+			action = random.choice(actions + ["NO_ACTION"])
 			if action == "NO_ACTION":
 				break
 			else:
 				GameHelper.execute(outcome, action)
+		print("done outside loop")
 		return outcome
 
-	def getBestActions(self, state, heuristic, max_actions = 1):
+	def getBestAction(self, state, heuristic):
+		pq = Queue.PriorityQueue()
+
+		return self.getRandomAction(state)
 		self.think(state)
 		self.ans_pair = [-10000, None]
 		self.root.get_optimal(heuristic, self.root.game, self.ans_pair)
