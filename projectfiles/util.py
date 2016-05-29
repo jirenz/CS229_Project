@@ -52,6 +52,7 @@ class GameHelper:
 				actions += [(2, i, None)]
 		if player.hero.power.can_use():
 			actions += [(3, None, None)]
+		actions += ["No_Action"]
 		#if len(actions) > 5:
 		#   print("action_size: " + str(len(actions)))
 		return actions
@@ -73,6 +74,7 @@ class GameHelper:
 
 	def execute(game, action):
 		try: 
+			if action == "No_Action": return
 			machine = FixedActionAgent(*action)
 			agent_backup = game.current_player.agent
 			game.current_player.agent = machine
@@ -80,9 +82,9 @@ class GameHelper:
 			game.current_player.agent = agent_backup
 			return True
 		except Exception as e:
-			game.current_player.agent = agent_backup
+			# game.current_player.agent = agent_backup
 			print("Excecution Error: " + str(e))
-			print("System stack: " + sys.exc_info()[0])
+			# print("System stack: " + sys.exc_info()[0])
 			raise # bacause the first action fails means that the action we found is erronous
 			return False
 

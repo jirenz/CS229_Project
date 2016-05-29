@@ -3,7 +3,7 @@ import collections
 import numpy as np
 import random
 
-import Queue
+import queue
 
 class StrategyNode():
 	def __init__(self, game, state_set):
