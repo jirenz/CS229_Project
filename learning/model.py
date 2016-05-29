@@ -23,6 +23,7 @@ class HearthstoneMDP(learning.mdp.MDP):
 		return state.game_ended
 
 	def getActions(self, state):
+		GameHelper.getActions(state)
 		# An "action" is actually parametrized directly by the state corresponding
 		# to the current player's actions. The strategy object enumerates a list of
 		# possible actions

@@ -1,6 +1,7 @@
 from projectfiles.feature_extract import *
 from hearthbreaker.agents.basic_agents import *
 import random
+import sys
 
 class FixedActionAgent(Agent):
 	def __init__(self, chosen_index, entity_index, target_index, minion_position_index = 0):
@@ -38,7 +39,6 @@ class GameHelper:
 	def generate_actions(game):
 		player = game.current_player
 		if game.game_ended: return []
-
 		actions = []
 		enemy_targets = GameHelper.get_enemy_targets(player)
 		for i, attack_minion in filter(lambda p: p[1].can_attack(), enumerate(player.minions)):
@@ -72,13 +72,19 @@ class GameHelper:
 		return targets
 
 	def execute(game, action):
-		hero_1 = game.other_player.hero.__to_json__()
-		machine = FixedActionAgent(*action)
-		game.current_player.agent = machine
-		machine.do_turn(game.current_player)
-		hero_2 = game.other_player.hero.__to_json__()
-		print("1: " + str(hero_1) + '\n' + "2: " + str(hero_2) + '\n')
-		return game
+		try: 
+			machine = FixedActionAgent(*action)
+			agent_backup = game.current_player.agent
+			game.current_player.agent = machine
+			machine.do_turn(game.current_player)
+			game.current_player.agent = agent_backup
+			return True
+		except Exception as e:
+			game.current_player.agent = agent_backup
+			print("Excecution Error: " + str(e))
+			print("System stack: " + sys.exc_info()[0])
+			raise # bacause the first action fails means that the action we found is erronous
+			return False
 
 	def hashgame(game):
 		return tuple(feature_extractor(game.current_player)).__hash__()
