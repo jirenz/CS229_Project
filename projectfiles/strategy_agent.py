@@ -33,6 +33,5 @@ class StrategyAgent(DoNothingAgent):
 		# options = self.filter_options(options, player)
 		return # self.machine.choose_option(options, player)
 
-	def decide(self, game)
-
+	def decide(self, game):
 		return action

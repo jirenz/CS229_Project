@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
 	ql = QLearningAlgorithm(mdp = training_mdp,
 		eta = 0.01, 
-		explore_prob = 0.1,
+		explore_prob = 100,
 		function_approximator = model)
 
-	ql.train(2)
+	ql.train(10)
