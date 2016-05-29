@@ -14,13 +14,16 @@ class QLearningAlgorithm:
 		return max(self.getQ(state, action) for action in self.mdp.getActions(state))
 
 	def getQPolicy(self, state):
-		return max((self.getQ(state, action), action) for action in self.mdp.getActions(state))[1]
+		return max(((self.getQ(state, action), action) for action in self.mdp.getActions(state)),
+				key = lambda x: x[0])[1]
 
 	def train(self, epochs = 10):
 		for epoch in range(epochs):
 			state = self.mdp.start_state()
 
 			while not self.mdp.is_end_state(state):
+				state._start_turn()
+
 				print("current state", state.current_player.name)
 				if random.random() < self.explore_prob:
 					next_action = random.choice(self.mdp.getActions(state))
@@ -31,6 +34,7 @@ class QLearningAlgorithm:
 				self.F.update(state, next_action, \
 					reward + self.mdp.getDiscount() * self.getV(next_state))
 
+				next_state._end_turn()
 				state = next_state
 
 class ExperienceReplayQ(QLearningAlgorithm):
