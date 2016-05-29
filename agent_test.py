@@ -29,7 +29,7 @@ def spark_weights(weights):
 	#	print(line)
 
 def test_agent_once(one, other = None):
-	print("game_started")
+	#print("game_started")
 	generator = RandomDeckGenerator()
 	deck1 = generator.generate()
 	deck2 = deck1.copy()
@@ -65,9 +65,9 @@ def run_agent(one, other, number):
 		else:
 			print("Error")
 			err += 1
-			if err > 5:
-				print("Aborting after 5 errors.")
-				break
+			#if err > 100:
+			#	print("Aborting after 5 errors.")
+			#	break
 	print(winning_count)
 
 
@@ -78,5 +78,5 @@ if __name__ == "__main__":
 	# ql.explore_prob = 0.0
 	# ql.learn = False
 	# run_agent(ql, None, int(sys.argv[2]))
-	run_agent(RandomAgent(), StrategyAgent(), int(sys.argv[1]))
+	run_agent(StrategyAgent(), TradeAgent(), int(sys.argv[1]))
 	# ,
