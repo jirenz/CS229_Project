@@ -4,8 +4,6 @@ import collections
 import numpy as np
 from projectfiles.feature_extract import *
 
-
-
 class DoFixedThingsMachine(Agent):
     def __init__(self, chosen_index, entity_index, target_index, minion_position_index = 0):
         self.chosen_index = chosen_index
