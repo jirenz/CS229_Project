@@ -156,4 +156,4 @@ class StrategyManager():
 
     def __call__(self, state):
         self.think(state)
-        return self.get_outcomes(state)
+        return self.get_outcomes()
