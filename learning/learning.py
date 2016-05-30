@@ -1,8 +1,9 @@
 import random
 import json
 
+from projectfiles.util import spark_weights
+
 import numpy as np
-from sparklines import sparklines
 
 class QLearningAlgorithm:
 	def __init__(self, mdp, eta, explore_prob, function_approximator):
@@ -19,12 +20,6 @@ class QLearningAlgorithm:
 	def getV(self, state):
 		return self.getQ(state, self.mdp.getBestAction(state, self.getQ))
 		# return max(self.getQ(state, action) for action in self.mdp.getActions(state))
-
-	def spark_weights(weights):
-		W = weights - np.min(weights)
-		W = W * 30 / (np.max(W) + 1e-6)
-		for line in sparklines(list(W), num_lines = 3):
-			print(line)
 
 	def epsilon_greedy(self, state):
 		if random.random() < self.explore_prob:
@@ -63,7 +58,6 @@ class QLearningAlgorithm:
 
 		for epoch in range(epochs):
 			self.simulate_game(qlearning_update)
-
 
 class ExperienceReplayQ(QLearningAlgorithm):
 	def __init__(self, mdp, eta, explore_prob, function_approximator,
@@ -120,7 +114,7 @@ class ExperienceReplayQ(QLearningAlgorithm):
 				# print(r_state.current_player.name, action.current_player.name, next_state.current_player.name)
 				self.F.update(r_state, action, \
 						self.eta * (reward + self.mdp.getDiscount() * self.getV(next_state) - self.getQ(r_state, action)))
-				QLearningAlgorithm.spark_weights(self.F.weights)
+				spark_weights(self.F.weights)
 
 			# truncate experience
 			self.experience += game_experience
@@ -133,7 +127,7 @@ class ExperienceReplayQ(QLearningAlgorithm):
 				next_state, _ = self.mdp.getSuccAndReward(r_state, action)
 				self.F.update(r_state, action, \
 						self.eta * (reward + self.mdp.getDiscount() * self.getV(next_state) - self.getQ(r_state, action)))
-				QLearningAlgorithm.spark_weights(self.F.weights)
+				spark_weights(self.F.weights)
 
 			self.F.feature_extractor.debug(self.F.weights)
 

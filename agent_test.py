@@ -15,9 +15,6 @@ from projectfiles.deck_loader import DeckLoader
 from projectfiles.hearthlogger import Hearthlogger
 from projectfiles.agent import *
 from projectfiles.feature_extract import *
-from projectfiles.feature_extract_2 import *
-
-# from sparklines import sparklines
 
 from projectfiles.strategy_agent import *
 from learning.function_approximator import *
@@ -26,13 +23,7 @@ from learning.model import *
 import numpy as np
 import pickle
 
-from sparklines import sparklines
-
-def spark_weights(weights):
-	W = weights - np.min(weights)
-	W = W * 30 / np.max(W)
-	for line in sparklines(list(W), num_lines = 3):
-		print(line)
+from projectfiles.util import spark_weights
 
 def test_agent_once(one, other = None):
 	#print("game_started")

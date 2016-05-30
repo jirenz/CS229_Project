@@ -3,7 +3,6 @@ from learning.strategy import StrategyManager
 from learning.learning import *
 
 from projectfiles.feature_extract import *
-from projectfiles.feature_extract_2 import *
 
 import numpy as np
 import pickle

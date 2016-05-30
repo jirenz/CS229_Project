@@ -15,7 +15,6 @@ from projectfiles.deck_loader import DeckLoader
 from projectfiles.hearthlogger import Hearthlogger
 from projectfiles.agent import *
 from projectfiles.feature_extract import *
-from projectfiles.feature_extract_2 import *
 from projectfiles import *
 from learning.strategy import StrategyManager
 from learning.model import *
