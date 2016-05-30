@@ -68,7 +68,7 @@ class QLearningAlgorithm:
 class ExperienceReplayQ(QLearningAlgorithm):
 	def __init__(self, mdp, eta, explore_prob, function_approximator,
 			experience_size = 500,
-			replays_per_epoch = 50):
+			replays_per_epoch = 20):
 		super().__init__(mdp, eta, explore_prob, function_approximator)
 		self.experience_size = experience_size
 		self.replays_per_epoch = replays_per_epoch
@@ -134,4 +134,6 @@ class ExperienceReplayQ(QLearningAlgorithm):
 				self.F.update(r_state, action, \
 						self.eta * (reward + self.mdp.getDiscount() * self.getV(next_state) - self.getQ(r_state, action)))
 				QLearningAlgorithm.spark_weights(self.F.weights)
+
+			self.F.feature_extractor.debug(self.F.weights)
 

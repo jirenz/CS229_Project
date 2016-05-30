@@ -97,7 +97,7 @@ class RelativeResourceExtractor(StatePairFeatureExtractor):
 		prefix_update(feat, oppo_gain, 'oppo-gain-')
 		prefix_update(feat, relative_gain, 'relative-gain-')
 
-		del next_game
+		# del next_game
 		# print(len(feat))
 		if self.keys is None:
 			self.keys = list(feat.keys())
@@ -189,7 +189,90 @@ class ResourceExtractor(StateFeatureExtractor):
 
 	def debug(self, weights):
 		vals = [(val, i) for i, val in enumerate(list(weights))]
-		vals.sort(reverse=True)
+		vals.sort(key=lambda x: abs(x[0]), reverse=True)
+
+		for val, i in vals[:20]:
+			print(self.keys[i], ":", val)
+
+
+class TestResourceExtractor(StateFeatureExtractor):
+	def __init__(self):
+		self.keys = None
+
+	def __call__(self, game):
+		player = game.current_player
+		oppo = player.opponent
+
+		feat = {}
+
+		def resource(player):
+			resources = {}
+			minion_stats = [(minion.calculate_attack(), minion.health) for minion in player.minions]
+			minion_stats.sort()
+			for i, minion in enumerate(minion_stats + [None] * (8 - len(player.minions))):
+				if minion is not None:
+					attack, health = minion
+				else:
+					attack, health = 0, 0
+				# resources['minion-%d-attack' % i] = attack
+				# resources['minion-%d-health' % i] = health
+			resources['minion-total-attack'] = sum(attack for attack, health in minion_stats)
+			resources['minion-total-health'] = sum(health for attack, health in minion_stats)
+			resources['minion-count'] = len(player.minions)
+			resources['hero-health'] = player.hero.health
+			resources['hero-armor'] = player.hero.armor
+			resources['combined-health'] = resources['hero-health'] + resources['minion-total-health']
+			resources['mana'] = player.mana
+			resources['max-mana'] = player.max_mana
+			# resources['current-overload'] = player.current_overload
+			# resources['upcoming-overload'] = player.upcoming_overload
+			resources['deck-cards'] = len(player.deck.cards)
+			resources['hand-cards'] = len(player.hand)
+			# resources['fatigue'] = player.fatigue
+			resources['spell-damage'] = player.spell_damage
+			resources['spell-multiplier'] = player.spell_multiplier
+			resources['heal-multiplier'] = player.heal_multiplier
+			resources['heal-does-damage'] = player.heal_does_damage
+			# resources['cards-played'] = player.cards_played
+			return resources
+		
+		def diff(a, b):
+			feats = {}
+			for k in a.keys():
+				feats[k] = a[k] - b[k]
+			return feats
+
+		def prefix_update(a, b, prefix):
+			for k in b.keys():
+				a[prefix + k] = b[k]
+
+		player_r = resource(player)
+		oppo_r = resource(oppo)
+
+		prefix_update(feat, player_r, 'player-')
+		prefix_update(feat, oppo_r, 'oppo-')
+
+		# print(len(feat))
+
+		if self.keys is None:
+			self.keys = list(feat.keys())
+			self.keys.sort()
+
+		return np.array([feat[key] for key in self.keys], dtype=np.float64)
+
+	def get_initial(self):
+		generator = RandomDeckGenerator()
+		deck1 = generator.generate()
+		deck2 = deck1.copy()
+		game = Game([deck1, deck2], [RandomAgent(), RandomAgent()])
+		return np.zeros(self.__call__(game).shape)
+
+	def debug(self, weights):
+		if self.keys is None:
+			self.get_initial()
+
+		vals = [(val, i) for i, val in enumerate(list(weights))]
+		vals.sort(key=lambda x: abs(x[0]), reverse=True)
 
 		for val, i in vals[:20]:
 			print(self.keys[i], ":", val)

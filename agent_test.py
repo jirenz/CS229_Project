@@ -24,6 +24,7 @@ from learning.function_approximator import *
 from learning.model import *
 
 import numpy as np
+import pickle
 
 from sparklines import sparklines
 
@@ -86,12 +87,13 @@ if __name__ == "__main__":
 	# run_agent(ql, None, int(sys.argv[2]))
 
 	with open("ql_phi1_weights", "rb") as f:
-		weights = np.load(f)
+		model = pickle.load(f)
 
-	spark_weights(weights)
+	spark_weights(model.weights)
 	# model2 = BasicFunctionApproximator()
-	phi = RelativeResourceExtractor()
-	model = StatePairLinearModel(phi, weights)
+	# phi = TestResourceExtractor()
+	# phi = RelativeResourceExtractor()
+	# model = StatePairLinearModel(phi, weights)
 	# phi = ResourceExtractor()
 	# model = FinalStateLinearModel(phi, weights)
 	run_agent(TradeAgent(), StrategyAgent(model), int(sys.argv[1]))
