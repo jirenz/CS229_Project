@@ -12,7 +12,9 @@ class QLearningAlgorithm:
 		self.F = function_approximator
 
 	def getQ(self, state, action):
-		return self.F(state, action)
+		next_state = action.copy()
+		next_state._end_turn()
+		return self.F(state, next_state)
 
 	def getV(self, state):
 		return self.getQ(state, self.mdp.getBestAction(state, self.getQ))
@@ -24,49 +26,50 @@ class QLearningAlgorithm:
 		for line in sparklines(list(W), num_lines = 3):
 			print(line)
 
-	def epsilonGreedy(self, state):
+	def epsilon_greedy(self, state):
 		if random.random() < self.explore_prob:
-			print("get random action")
+			print("epsilon_greedy: get random action")
 			# next_action = random.choice(self.mdp.getActions(state))
 			return self.mdp.getRandomAction(state)
 		else:
-			print("get best action")
+			print("epsilon_greedy: get best action")
 			return self.mdp.getBestAction(state, self.getQ)
+	
+	def simulate_game(self, callback):
+		state = self.mdp.start_state()
+
+		turns = 0
+		while not self.mdp.is_end_state(state):
+			state._start_turn()
+
+			print("simulate_game: turn", turns, "current player", state.current_player.name)
+			# print(state.current_player.hero.__to_json__())
+
+			action = self.epsilon_greedy(state)
+			next_state, reward = self.mdp.getSuccAndReward(state, action)
+			next_state._end_turn()
+			
+			callback(state, action, reward, next_state)
+
+			state = next_state
+			turns += 1
 
 	def train(self, epochs = 10):
+		def qlearning_update(state, action, reward, next_state):
+			self.F.update(state, next_action, \
+				reward + self.mdp.getDiscount() * self.getV(next_state))
+			QLearningAlgorithm.spark_weights(self.F.weights)
+
 		for epoch in range(epochs):
-			state = self.mdp.start_state()
+			self.simulate_game(qlearning_update)
 
-			turns = 0
-			while not self.mdp.is_end_state(state):
-				state._start_turn()
-
-				print("current state", state.current_player.name, turns)
-				print(state.current_player.hero.__to_json__())
-
-				next_action = self.epsilonGreedy(state)
-				print("getting reward")
-				next_state, reward = self.mdp.getSuccAndReward(state, next_action)
-				print("update")
-				self.F.update(state, next_action, \
-						reward + self.mdp.getDiscount() * self.getV(next_state))
-				
-				#print(self.F.weights)
-				QLearningAlgorithm.spark_weights(self.F.weights)
-
-				next_state._end_turn()
-				print(next_state.current_player.hero.__to_json__())
-				state = next_state
-				turns += 1
 
 class ExperienceReplayQ(QLearningAlgorithm):
-	def __init__(self, mdp, eta, explore_prob, rewards, function_approximator,
+	def __init__(self, mdp, eta, explore_prob, function_approximator,
 			experience_size = 1000,
-			replay_size = 100,
-			replays_per_epoch = 1):
-		super().__init__(mdp, eta, explore_prob, rewards, function_approximator)
+			replays_per_epoch = 50):
+		super().__init__(mdp, eta, explore_prob, function_approximator)
 		self.experience_size = experience_size
-		self.replay_size = replay_size
 		self.replays_per_epoch = replays_per_epoch
 
 		# list of (state, next_state, reward) tuples
@@ -77,12 +80,10 @@ class ExperienceReplayQ(QLearningAlgorithm):
 			state = self.mdp.start_state()
 			history = []
 
-			while not self.mdp.is_end_state(state):
-				next_action = self.epsilonGreedy(state)
-				history.append((state, next_action))
+			def save_history(state, action, reward, next_state):
+				history.append((state, action))
 
-				next_state, _ = self.mdp.getSuccAndReward(state, next_action)
-				state = next_state
+			self.simulate_game(save_history)
 
 			# ... s1 a1 (p0), s2 a2 (p1), END : last action by p1, p1 either won or lost
 			# the last state tells you the winner. suppose p0 won, then we should get
@@ -92,28 +93,40 @@ class ExperienceReplayQ(QLearningAlgorithm):
 			# last states get a special case reward:
 			s1, a1 = history[-2]
 			s2, a2 = history[-1]
+			game_experience = []
+			print("RESULT", s1.current_player.name, s2.current_player.name, state.winner.name if state.winner is not None else "tie")
 			if state.winner is None:
-				self.experience.append((s1, a1, self.mdp.getReward("tie")))
-				self.experience.append((s2, a2, self.mdp.getReward("tie")))
+				game_experience.append((s1, a1, self.mdp.getReward("tie")))
+				game_experience.append((s2, a2, self.mdp.getReward("tie")))
 			else:
-				if state.winner == s1.current_player:
-					self.experience.append((s1, a1, self.mdp.getReward("win")))
-					self.experience.append((s2, a2, self.mdp.getReward("lose")))
+				if state.winner.name == s1.current_player.name:
+					game_experience.append((s1, a1, self.mdp.getReward("win")))
+					game_experience.append((s2, a2, self.mdp.getReward("lose")))
 				else:
-					self.experience.append((s1, a1, self.mdp.getReward("lose")))
-					self.experience.append((s2, a2, self.mdp.getReward("win")))
+					game_experience.append((s1, a1, self.mdp.getReward("lose")))
+					game_experience.append((s2, a2, self.mdp.getReward("win")))
 
 			# for all other states, give a zero reward
 			for s, a in history[-3::-1]:
-				self.experience.append((s, a, 0))
+				game_experience.append((s, a, 0))
+
+			# train on the current game
+			for r_state, action, reward in game_experience:
+				next_state, _ = self.mdp.getSuccAndReward(r_state, action)
+				self.F.update(r_state, action, \
+						reward + self.mdp.getDiscount() * self.getV(next_state))
+				QLearningAlgorithm.spark_weights(self.F.weights)
 
 			# truncate experience
+			self.experience += game_experience
 			if len(self.experience) > self.experience_size:
 				self.experience = random.sample(self.experience, self.experience_size)
 
-			for replay in range(self.replays_per_epoch):
-				replays = random.sample(self.experience, self.replay_size)
-				for r_state, next_action, reward in replays:
-					next_state, _ = self.mdp.getSuccAndReward(r_state, next_action)
-					self.F.update(r_state, next_action, \
-							reward + self.mdp.getDiscount() * self.getV(next_state))
+			for episode in range(self.replays_per_epoch):
+				print("Episode", episode)
+				r_state, action, reward = random.choice(self.experience)
+				next_state, _ = self.mdp.getSuccAndReward(r_state, action)
+				self.F.update(r_state, action, \
+						reward + self.mdp.getDiscount() * self.getV(next_state))
+				QLearningAlgorithm.spark_weights(self.F.weights)
+
