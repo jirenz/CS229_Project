@@ -571,7 +571,10 @@ class Deck:
 
     def copy(self):
         def copy_card(card):
-            new_card = type(card)()
+            if isinstance(card, Minion):
+            	new_card = card.copy(card.current_player)
+            else:
+            	new_card = type(card)()          	
             new_card.drawn = card.drawn
             return new_card
         new_deck = Deck.__new__(Deck)
