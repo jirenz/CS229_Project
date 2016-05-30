@@ -4,6 +4,8 @@ import numpy as np
 import random
 
 from projectfiles.game_history_generator import *
+from sklearn import linear_model
+
 
 
 class BasicFunctionApproximator:
@@ -41,25 +43,29 @@ class SimpleExtractor:
 	
 class LinearFunctionApproximator(BasicFunctionApproximator):
 	def __init__(self, initial_weights = None):
+		self.extractor = ResourceExtractor()
 		if initial_weights is None:
-			self.weights = feature_extractor_initial()
+			self.weights = self.extractor.get_initial()
 		else:
 			self.weights = initial_weights
 
 	def eval(self, state_1, state_2):
-		return np.dot(feature_extractor(state_2.current_player), self.weights)
+		return np.dot(self.extractor(state_2), self.weights)
 
 	def train(self, numgames):
-		deltas = [0.3, 0.1, 0.01, 0.05]
 		training_set = GameHistoryGenerator()(numgames)
-		for delta in deltas:
-			traning_set = random.shuffle(training_set)
-			for data_point in training_set:
-				print(str(self.weights))
-				self.update(data_point[0], data_point[1], delta)
+		clf = linear_model.LinearRegression()
+		X = []
+		y = []
+		for data_point in training_set:
+			X.append(self.extractor(data_point[0]))
+			y.append(data_point[1])
+		clf.fit(X, y)
+		self.weights = clf.coef_
+		print(self.weights)
 
 	def update(self, game, score, delta):
-		phi = feature_extractor(game.current_player)
+		phi = self.extractor(game)
 		original_score = np.dot(self.weights, phi)
 		self.weights += 0.001 * delta * (score - original_score) * phi
 		self.weights /= np.sqrt(np.dot(self.weights, self.weights)) + 1e-6

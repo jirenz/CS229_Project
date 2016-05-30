@@ -57,9 +57,25 @@ class ActionTreeManager():
         self.root = ActionTreeNode(game_state = game_state, state_set = self.state_set)
 
     def think_fully(self):
-        self.game_states_to_think = queue.Queue()
-        
+        if self.root = None raise("Unnitialized root for growing.")
+        q = queue.Queue()
+        q.put(self.root)
+        while not q.empty():
+            node = q.get()
+            node.generate_children()
+            for child in node.children:
+                q.put(child)
+
+    def branch_think(self, branching_decider = None):
+        if branching_decider is None:
+            branching_decider = BasicBrachingDecider()
 
     def clear(self):
         self.state_set = set()
         self.root = None
+
+class BasicBrachingDecider():
+    def __init__(self, base_factor = 20):
+        self.base_factor = base_factor
+
+    def decide(self, )
