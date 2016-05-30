@@ -84,9 +84,15 @@ if __name__ == "__main__":
 	# ql.explore_prob = 0.0
 	# ql.learn = False
 	# run_agent(ql, None, int(sys.argv[2]))
-	with open("ql_phi2_weights", "rb") as f:
+
+	with open("ql_phi1_weights", "rb") as f:
 		weights = np.load(f)
-	
+
 	spark_weights(weights)
-	model = StatePairLinearModel(weights, feature_extractor_2_temporary)
+	# model2 = BasicFunctionApproximator()
+	phi = RelativeResourceExtractor()
+	model = StatePairLinearModel(phi, weights)
+	# phi = ResourceExtractor()
+	# model = FinalStateLinearModel(phi, weights)
 	run_agent(TradeAgent(), StrategyAgent(model), int(sys.argv[1]))
+	# phi.debug(weights)

@@ -103,7 +103,7 @@ class GameHelper:
 			return False
 
 	def hashgame(game):
-		return tuple(feature_extractor(game.current_player)).__hash__()
+		return tuple(ResourceExtractor()(game)).__hash__()
 
 	def game_to_json(game):
 		return json.dumps(game.__to_json__(), default=lambda o: o.__to_json__(), indent=1)

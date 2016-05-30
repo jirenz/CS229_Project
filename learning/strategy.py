@@ -84,27 +84,30 @@ class StrategyManager():
 		return outcome
 
 	def getBestAction(self, state, heuristic):
-		max_search, iteration = 20, 0
-		visited_states, pq = set(), []
+		max_search, iteration = 40, 0
+		visited_states, pq = dict(), []
 		best_value, best_outcomes = heuristic(state, state), [state]
-		visited_states.add(GameHelper.hashgame(state))
-		heapq.heappush(pq, ((best_value, iteration), state))
+		visited_states[GameHelper.hashgame(state)] = best_value
+		heapq.heappush(pq, ((-best_value, iteration), state))
 		while len(pq) > 0 and iteration < max_search:
 			current_value, current_state = heapq.heappop(pq)
-			# print(current_value, current_state.current_player.hero.__to_json__())
 
 			actions = GameHelper.generate_actions(current_state)
 			for action in actions:
 				outcome = current_state.copy()
 				GameHelper.execute(outcome, action)
-				if GameHelper.hashgame(outcome) not in visited_states:
-					next_value = heuristic(state, outcome)
-					if abs(best_value - next_value) < 1e-6:
-						best_outcomes.append(outcome)
-					elif best_value < next_value:
-						best_value, best_outcomes = next_value, [outcome]
-					iteration += 1
-					visited_states.add(GameHelper.hashgame(outcome))
-					heapq.heappush(pq, ((next_value, iteration), outcome))
+				next_value = heuristic(state, outcome)
+				outcome_hash = GameHelper.hashgame(outcome)
+				if outcome_hash in visited_states and \
+					next_value < visited_states[outcome_hash] + 1e-6:
+					continue
+
+				if abs(best_value - next_value) < 1e-6:
+					best_outcomes.append(outcome)
+				elif best_value < next_value:
+					best_value, best_outcomes = next_value, [outcome]
+				iteration += 1
+				visited_states[outcome_hash] = next_value
+				heapq.heappush(pq, ((-next_value, iteration), outcome))
 
 		return random.choice(best_outcomes)

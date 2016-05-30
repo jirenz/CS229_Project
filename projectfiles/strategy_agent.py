@@ -52,11 +52,10 @@ class StrategyAgent(DoNothingAgent):
 		for action in actions:
 			new_game = game.copy()
 			GameHelper.execute(new_game, action)
-			# new_value = BasicFunctionApproximator.eval(None, new_game)
 			new_value = self.model.eval(game, new_game)
 			# print(action, new_value)
 			if new_value > max_value:
 				max_value = new_value
 				max_action = action
-		print("BEST:", max_action, max_value)
+		# print("BEST:", max_action, max_value)
 		return max_action

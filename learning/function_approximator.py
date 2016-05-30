@@ -1,7 +1,10 @@
 from hearthbreaker.engine import *
 
 class BasicFunctionApproximator:
-	def eval(state_1, state_2):
+	def __init__(self):
+		pass
+
+	def eval(self, state_1, state_2):
 		def score(player):
 			score = 0
 			for i in player.minions:

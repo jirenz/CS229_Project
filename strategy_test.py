@@ -28,7 +28,7 @@ def test_strategy():
     game.pre_game()
     game.current_player = game.players[1]
     while not game.game_ended:
-        manager = StrategyManager(StatePairLinearModel(feature_extractor_2_initial(), feature_extractor_2_temporary))
+        manager = StrategyManager(StatePairLinearModel(RelativeResourceExtractor()))
         manager.think(game)
         outcomes = manager.get_outcomes()
         print("Number of outcomes: " + str(len(outcomes)) + '\n')
