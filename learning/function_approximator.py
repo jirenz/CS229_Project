@@ -5,7 +5,11 @@ import random
 
 from projectfiles.game_history_generator import *
 
-class BasicFunctionApproximator():
+
+class BasicFunctionApproximator:
+	def __init__(self):
+		pass
+		
 	def eval(self, state_1, state_2):
 		def score(player):
 			score = 0

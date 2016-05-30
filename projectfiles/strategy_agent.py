@@ -23,7 +23,7 @@ class StrategyAgent(DoNothingAgent):
 			self.action = self.decide(game)
 			GameHelper.execute(game, self.action)
 			print("Me: " + str(player.hero.health) + " Him: " + str(game.other_player.hero.health))
-			if self.action == "No_Action":
+			if self.action == GameHelper.NO_ACTION:
 				return
 
 	def choose_target(self, targets):
@@ -49,7 +49,7 @@ class StrategyAgent(DoNothingAgent):
 
 	def decide(self, game):
 		max_value = -1000
-		max_action = "No_Action"
+		max_action = GameHelper.NO_ACTION
 		actions = GameHelper.generate_actions(game)
 		for action in actions:
 			new_game = game.copy()
@@ -58,4 +58,5 @@ class StrategyAgent(DoNothingAgent):
 			if new_value > max_value:
 				max_value = new_value
 				max_action = action
+		# print("BEST:", max_action, max_value)
 		return max_action

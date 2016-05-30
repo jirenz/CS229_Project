@@ -20,14 +20,15 @@ from learning.function_approximator import *
 
 # from sparklines import sparklines
 
+
 from projectfiles.strategy_agent import *
 from learning.function_approximator import *
+from learning.model import *
 
-def spark_weights(weights):
-	W = weights - np.min(weights)
-	W = W * 30 / np.max(W)
-	#for line in sparklines(list(W), num_lines = 3):
-	#	print(line)
+import numpy as np
+import pickle
+
+from projectfiles.util import spark_weights
 
 def test_agent_once(one, other = None):
 	#print("game_started")

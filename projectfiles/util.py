@@ -4,6 +4,14 @@ import random
 import sys
 import json
 
+from sparklines import sparklines
+
+def spark_weights(weights):
+	W = weights - np.min(weights)
+	W = W * 30 / (np.max(W) + 1e-6)
+	for line in sparklines(list(W), num_lines = 3):
+		print(line)
+
 class FixedActionAgent(Agent):
 	def __init__(self, chosen_index, entity_index, target_index, minion_position_index = 0):
 		self.chosen_index = chosen_index
@@ -26,6 +34,7 @@ class FixedActionAgent(Agent):
 			player.hero.power.use()
 
 	def choose_target(self, targets):
+		# print("Machine choose target")
 		# print("Targets: " + str(targets))
 		# print("My index: " + str(self.target_index))
 		# print("Hero: " + str(self.player.hero))
@@ -44,6 +53,8 @@ class FixedActionAgent(Agent):
 		return options[random.randint(0, len(options) - 1)]
 
 class GameHelper:
+	NO_ACTION = "NO_ACTION"
+
 	def generate_actions(game):
 		player = game.current_player
 		if game.game_ended: return []
@@ -63,8 +74,7 @@ class GameHelper:
 				actions += [(3, None, None)]
 			else:
 				actions += [(3, None, target) for target in range(len(player.hero.power.allowed_targets()))]
-				# print("Power can target: " + str(player.hero.power.allowed_targets()))
-		actions += ["No_Action"]
+		actions += [GameHelper.NO_ACTION]
 		#if len(actions) > 5:
 		#   print("action_size: " + str(len(actions)))
 		return actions
@@ -86,7 +96,7 @@ class GameHelper:
 
 	def execute(game, action):
 		try: 
-			if action == "No_Action": return
+			if action == GameHelper.NO_ACTION: return
 			machine = FixedActionAgent(*action)
 			agent_backup = game.current_player.agent
 			game.current_player.agent = machine
@@ -101,7 +111,7 @@ class GameHelper:
 			return False
 
 	def hashgame(game):
-		return tuple(feature_extractor(game.current_player)).__hash__()
+		return tuple(ResourceExtractor()(game)).__hash__()
 
 	def game_to_json(game):
 		return json.dumps(game.__to_json__(), default=lambda o: o.__to_json__(), indent=1)
