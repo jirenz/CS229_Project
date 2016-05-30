@@ -1,8 +1,9 @@
 from hearthbreaker.agents.basic_agents import *
 import collections
-import numpy as np
 from projectfiles.feature_extract import *
 from learning.strategy import *
+from learning.function_approximator import *
+import json
 
 class StrategyAgent(DoNothingAgent):
 	def __init__(self): # eta, explore_prob, discount, feature_extractor, learn = True):
@@ -12,27 +13,40 @@ class StrategyAgent(DoNothingAgent):
 		return [True, True, True, True]
 
 	def do_turn(self, player):
+		self.player = player
 		game = player.game
-		action = self.decide(game)
-		if action:
+		while True:
+			action = self.decide(game)
 			GameHelper.execute(game, action)
-		else: 
-			return
+			print("Me: " + str(player.hero.health) + " Him: " + str(game.other_player.hero.health))
+			if action == "No_Action":
+				return
 
 	def choose_target(self, targets):
-		raise
+		print(GameHelper.game_to_json(self.player.game))
+		print(str(targets))
+		raise Exception("asked to choose target")
 		return
 		# return self.machine.choose_target(targets)
 
 	def choose_index(self, card, player):
-		raise
+		raise Exception("asked to choose index")
 		return # self.machine.choose_index(card, player)
 
 	def choose_option(self, options, player):
-		raise
+		raise Exception("asked to choose option")
 		# options = self.filter_options(options, player)
 		return # self.machine.choose_option(options, player)
 
-	def decide(self, game)
-
-		return action
+	def decide(self, game):
+		max_value = -1000
+		max_action = "No_Action"
+		actions = GameHelper.generate_actions(game)
+		for action in actions:
+			new_game = game.copy()
+			GameHelper.execute(new_game, action)
+			new_value = BasicFunctionApproximator.eval(None, new_game)
+			if new_value > max_value:
+				max_value = new_value
+				max_action = action
+		return max_action

@@ -492,6 +492,7 @@ class Player(Bindable):
         aura.unapply()
 
     def choose_target(self, targets):
+        print("Asking agent: " + str(self.agent) + "to choose target.")
         return self.agent.choose_target(targets)
 
     def is_valid(self):
