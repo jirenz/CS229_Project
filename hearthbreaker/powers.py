@@ -1,3 +1,4 @@
+import hearthbreaker.targeting
 from copy import copy
 
 
@@ -15,6 +16,11 @@ class Power:
             self.hero.player.mana -= 2
             self.used = True
 
+    def allowed_targets(self):
+        return [None]
+
+    def power_targets(self):
+        return hearthbreaker.targeting.find_spell_target(self.hero.player.game, lambda t: t.spell_targetable())
 
 class DruidPower(Power):
     def use(self):
@@ -33,7 +39,12 @@ class HunterPower(Power):
         else:
             super().use()
             self.hero.player.game.other_player.hero.damage(2 * self.hero.player.spell_multiplier, None)
-
+    
+    def allowed_targets(self):
+        if self.hero.power_targets_minions:
+            return self.power_targets()
+        else:
+            return [None]
 
 class MagePower(Power):
     def use(self):
@@ -41,6 +52,9 @@ class MagePower(Power):
         super().use()
         target.damage(1 * self.hero.player.spell_multiplier, None)
         self.hero.player.game.check_delayed()
+
+    def allowed_targets(self):
+        return self.power_targets()
 
 
 class PriestPower(Power):
@@ -55,6 +69,9 @@ class PriestPower(Power):
     def __str__(self):
         return "Lesser Heal"
 
+    def allowed_targets(self):
+        return self.power_targets()
+
 
 # Special power the priest can obtain via the card Shadowform
 class MindSpike(Power):
@@ -66,6 +83,9 @@ class MindSpike(Power):
     def __str__(self):
         return "Mind Spike"
 
+    def allowed_targets(self):
+        return self.power_targets()
+
 
 # Special power the priest can obtain via the card Shadowform
 class MindShatter(Power):
@@ -76,6 +96,9 @@ class MindShatter(Power):
 
     def __str__(self):
         return "Mind Shatter"
+
+    def allowed_targets(self):
+        return self.power_targets()
 
 
 class PaladinPower(Power):
