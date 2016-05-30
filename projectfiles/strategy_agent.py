@@ -45,7 +45,7 @@ class StrategyAgent(DoNothingAgent):
 		print("Warning: Deciding option through Strategy Agent")
 		# raise Exception("asked to choose option")
 		# options = self.filter_options(options, player)
-		return # self.machine.choose_option(options, player)
+		return options[random.randint(0, len(options) - 1)]
 
 	def decide(self, game):
 		max_value = -1000
