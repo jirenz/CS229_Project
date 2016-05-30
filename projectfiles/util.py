@@ -27,7 +27,11 @@ class FixedActionAgent(Agent):
 
 	def choose_target(self, targets):
 		# print("Machine choose target")
-		if self.target_index is not None:
+		# print("Targets: " + str(targets))
+		# print("My index: " + str(self.target_index))
+		# print("Hero: " + str(self.player.hero))
+		# print("Machine choose target")
+		if self.target_index is not None and self.target_index < len(targets):
 			return targets[self.target_index]
 		else:
 			return targets[random.randint(0, len(targets) - 1)]

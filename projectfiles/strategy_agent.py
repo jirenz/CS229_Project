@@ -6,7 +6,8 @@ from learning.function_approximator import *
 import json
 
 class StrategyAgent(DoNothingAgent):
-	def __init__(self): # eta, explore_prob, discount, feature_extractor, learn = True):
+	def __init__(self, model): # eta, explore_prob, discount, feature_extractor, learn = True):
+		self.model = model
 		super().__init__()
 
 	def do_card_check(self, cards):
@@ -16,37 +17,45 @@ class StrategyAgent(DoNothingAgent):
 		self.player = player
 		game = player.game
 		while True:
-			action = self.decide(game)
-			GameHelper.execute(game, action)
-			print("Me: " + str(player.hero.health) + " Him: " + str(game.other_player.hero.health))
-			if action == "No_Action":
+			self.action = self.decide(game)
+			GameHelper.execute(game, self.action)
+			# print("Me: " + str(player.hero.health) + " Him: " + str(game.other_player.hero.health))
+			if self.action == GameHelper.NO_ACTION:
 				return
 
 	def choose_target(self, targets):
-		print(GameHelper.game_to_json(self.player.game))
-		print(str(targets))
-		raise Exception("asked to choose target")
-		return
+		print("Warning: Deciding target through Strategy Agent")
+		# raise Exception("asked to choose target")
+		if self.action[2] is not None and self.action[2] < len(targets):
+			return targets[self.action[2]]
+		else:
+			return targets[random.randint(0, len(targets) - 1)]
 		# return self.machine.choose_target(targets)
 
 	def choose_index(self, card, player):
-		raise Exception("asked to choose index")
-		return # self.machine.choose_index(card, player)
+		print("Warning: Deciding index through Strategy Agent")
+		return self.action[1]
+		# raise Exception("asked to choose index")
+		# self.machine.choose_index(card, player)
 
 	def choose_option(self, options, player):
-		raise Exception("asked to choose option")
+		print("Warning: Deciding option through Strategy Agent")
+		# raise Exception("asked to choose option")
 		# options = self.filter_options(options, player)
 		return # self.machine.choose_option(options, player)
 
 	def decide(self, game):
 		max_value = -1000
-		max_action = "No_Action"
+		max_action = GameHelper.NO_ACTION
 		actions = GameHelper.generate_actions(game)
 		for action in actions:
 			new_game = game.copy()
 			GameHelper.execute(new_game, action)
-			new_value = BasicFunctionApproximator.eval(None, new_game)
+			# new_value = BasicFunctionApproximator.eval(None, new_game)
+			new_value = self.model.eval(game, new_game)
+			# print(action, new_value)
 			if new_value > max_value:
 				max_value = new_value
 				max_action = action
+		print("BEST:", max_action, max_value)
 		return max_action

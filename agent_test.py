@@ -21,14 +21,17 @@ from projectfiles.feature_extract_2 import *
 
 from projectfiles.strategy_agent import *
 from learning.function_approximator import *
+from learning.model import *
 
 import numpy as np
+
+from sparklines import sparklines
 
 def spark_weights(weights):
 	W = weights - np.min(weights)
 	W = W * 30 / np.max(W)
-	#for line in sparklines(list(W), num_lines = 3):
-	#	print(line)
+	for line in sparklines(list(W), num_lines = 3):
+		print(line)
 
 def test_agent_once(one, other = None):
 	print("game_started")
@@ -81,10 +84,9 @@ if __name__ == "__main__":
 	# ql.explore_prob = 0.0
 	# ql.learn = False
 	# run_agent(ql, None, int(sys.argv[2]))
-
 	with open("ql_phi2_weights", "rb") as f:
 		weights = np.load(f)
 	
+	spark_weights(weights)
 	model = StatePairLinearModel(weights, feature_extractor_2_temporary)
 	run_agent(TradeAgent(), StrategyAgent(model), int(sys.argv[1]))
-	# ,
