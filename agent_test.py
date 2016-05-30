@@ -80,4 +80,4 @@ if __name__ == "__main__":
 	# ql.learn = False
 	# run_agent(ql, None, int(sys.argv[2]))
 	run_agent(TradeAgent(), StrategyAgent(), int(sys.argv[1]))
-	# ,
+	# 

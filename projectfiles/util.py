@@ -49,7 +49,7 @@ class GameHelper:
 		if game.game_ended: return []
 		actions = []
 		enemy_targets = GameHelper.get_enemy_targets(player)
-		for i, attack_minion in filter(lambda p: p[1].can_attack() and not p[1].frozen, enumerate(player.minions)):
+		for i, attack_minion in filter(lambda p: p[1].can_attack(), enumerate(player.minions)):
 			actions += [(0, i, target) for target in range(len(enemy_targets))]
 		if player.hero.can_attack():
 			actions += [(1, None, target) for target in range(len(enemy_targets))]
