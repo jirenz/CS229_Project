@@ -45,7 +45,7 @@ def test_agent_once(one, other = None):
 		print("Game error: " + str(e))
 		#print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
 		del new_game
-		raise
+		# raise
 		return False
 	print("winning agent: " + new_game.winner.agent.__class__.__name__)
 	# spark_weights(ql.weights)
