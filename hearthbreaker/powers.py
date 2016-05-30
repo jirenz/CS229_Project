@@ -17,7 +17,7 @@ class Power:
             self.used = True
 
     def allowed_targets(self):
-        return [None]
+        return None
 
     def power_targets(self):
         return hearthbreaker.targeting.find_spell_target(self.hero.player.game, lambda t: t.spell_targetable())

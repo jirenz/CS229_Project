@@ -3,6 +3,7 @@ import collections
 from projectfiles.feature_extract import *
 from learning.strategy import *
 from learning.function_approximator import *
+import json
 
 class StrategyAgent(DoNothingAgent):
 	def __init__(self): # eta, explore_prob, discount, feature_extractor, learn = True):
@@ -12,6 +13,7 @@ class StrategyAgent(DoNothingAgent):
 		return [True, True, True, True]
 
 	def do_turn(self, player):
+		self.player = player
 		game = player.game
 		while True:
 			action = self.decide(game)
@@ -21,6 +23,8 @@ class StrategyAgent(DoNothingAgent):
 				return
 
 	def choose_target(self, targets):
+		print(GameHelper.game_to_json(self.player.game))
+		print(str(targets))
 		raise Exception("asked to choose target")
 		return
 		# return self.machine.choose_target(targets)
