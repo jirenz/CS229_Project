@@ -39,5 +39,8 @@ def feature_extractor(player):
 	feat += [player.heal_does_damage, oppo.heal_does_damage]
 	feat += [player.cards_played, oppo.cards_played]
 
-	# print(feat)
+	# print(len(feat))
 	return np.array(feat, dtype=np.float64)
+
+def feature_extractor_initial():
+	return np.zeros((66, ))

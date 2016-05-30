@@ -2,7 +2,8 @@ from projectfiles.util import GameHelper, FixedActionAgent
 import collections
 import numpy as np
 import random
-import queue
+from collections import deque
+import heapq
 
 class StrategyNode():
 	def __init__(self, game, state_set):
@@ -46,21 +47,27 @@ class StrategyNode():
 			if (ans_pair[2] > 100): return
 
 class StrategyManager():
-	def __init__(self, function_approximator):
-		self.approximator = function_approximator
-		# self.approximator(state, next_state) => value
+	def __init__(self):
 		pass
 
-	def get_outcomes(self):
-		return self.root.get_outcomes()
+	def getActions(self, state):
+		outcomes = []
+		visited_states, q = set(), deque()
+		visited_states.add(GameHelper.hashgame(state))
+		q.append(state)
+		while len(q) > 0:
+			current_state = q.popleft()
+			outcomes.append(current_state)
 
-	def think(self, state):
-		self.store_state = set()
-		self.root = StrategyNode(state, self.store_state)
+			actions = GameHelper.generate_actions(current_state)
+			for action in actions:
+				outcome = current_state.copy()
+				GameHelper.execute(outcome, action)
+				if GameHelper.hashgame(outcome) not in visited_states:
+					visited_states.add(GameHelper.hashgame(outcome))
+					q.append(outcome)
 
-	def getActions(self, state, max_actions = 10):
-		self.think(state)
-		return self.get_outcomes()
+		return outcomes
 
 	def getRandomAction(self, state):
 		outcome = state.copy()
@@ -76,7 +83,27 @@ class StrategyManager():
 		return outcome
 
 	def getBestAction(self, state, heuristic):
-		self.think(state)
-		self.ans_pair = [-10000, None, 0]
-		self.root.get_optimal(heuristic, self.root.game, self.ans_pair)
-		return self.ans_pair[1]
+		max_search, iteration = 20, 0
+		visited_states, pq = set(), []
+		best_value, best_outcomes = heuristic(state, state), [state]
+		visited_states.add(GameHelper.hashgame(state))
+		heapq.heappush(pq, ((best_value, iteration), state))
+		while len(pq) > 0 and iteration < max_search:
+			current_value, current_state = heapq.heappop(pq)
+			# print(current_value, current_state.current_player.hero.__to_json__())
+
+			actions = GameHelper.generate_actions(current_state)
+			for action in actions:
+				outcome = current_state.copy()
+				GameHelper.execute(outcome, action)
+				if GameHelper.hashgame(outcome) not in visited_states:
+					next_value = heuristic(state, outcome)
+					if abs(best_value - next_value) < 1e-6:
+						best_outcomes.append(outcome)
+					elif best_value < next_value:
+						best_value, best_outcomes = next_value, [outcome]
+					iteration += 1
+					visited_states.add(GameHelper.hashgame(outcome))
+					heapq.heappush(pq, ((next_value, iteration), outcome))
+
+		return random.choice(best_outcomes)

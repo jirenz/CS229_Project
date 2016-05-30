@@ -19,7 +19,7 @@ class MDP:
 		"""Propose a random action"""
 		return random.choice(self.getActions(state))
 
-	def getBestActions(self, state, heuristic, max_actions = 1):
+	def getBestActions(self, state, heuristic):
 		scoredActions = map(lambda action: (heuristic(state, action), action), self.getActions(state))
 		scoredActions.sort(key=lambda q: q[0])
 		return scoredActions[:max_actions]

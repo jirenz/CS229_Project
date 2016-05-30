@@ -492,6 +492,8 @@ class Player(Bindable):
         aura.unapply()
 
     def choose_target(self, targets):
+        # print("Asking agent: " + str(self.agent) + "to choose target.")
+        # print("Hero: " + str(self.hero.name))
         return self.agent.choose_target(targets)
 
     def is_valid(self):
@@ -570,11 +572,11 @@ class Deck:
         self.left = 30
 
     def copy(self):
-        def copy_card(card):
-            if isinstance(card, Minion):
-            	new_card = card.copy(card.current_player)
-            else:
-            	new_card = type(card)()          	
+        def copy_card(card):       	
+            try:
+                new_card = type(card)()
+            except Exception as e:
+                print("Died at engine.py 577 card is ", card, " ", type(card).__class__.__name__)
             new_card.drawn = card.drawn
             return new_card
         new_deck = Deck.__new__(Deck)

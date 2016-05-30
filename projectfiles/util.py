@@ -2,6 +2,7 @@ from projectfiles.feature_extract import *
 from hearthbreaker.agents.basic_agents import *
 import random
 import sys
+import json
 
 class FixedActionAgent(Agent):
 	def __init__(self, chosen_index, entity_index, target_index, minion_position_index = 0):
@@ -14,6 +15,7 @@ class FixedActionAgent(Agent):
 		return [True, True, True, True]
 
 	def do_turn(self, player):
+		# print("Machine do turn")
 		if self.chosen_index == 0:
 			player.minions[self.entity_index].attack()
 		elif self.chosen_index == 1:
@@ -24,15 +26,21 @@ class FixedActionAgent(Agent):
 			player.hero.power.use()
 
 	def choose_target(self, targets):
-		if self.target_index is not None:
+		# print("Targets: " + str(targets))
+		# print("My index: " + str(self.target_index))
+		# print("Hero: " + str(self.player.hero))
+		# print("Machine choose target")
+		if self.target_index is not None and self.target_index < len(targets):
 			return targets[self.target_index]
 		else:
 			return targets[random.randint(0, len(targets) - 1)]
 
 	def choose_index(self, card, player):
+		# print("Machine choose minion index")
 		return self.minion_position_index
 
 	def choose_option(self, options, player):
+		# print("Machine choose option")
 		return options[random.randint(0, len(options) - 1)]
 
 class GameHelper:
@@ -50,8 +58,12 @@ class GameHelper:
 				actions += [(2, i, target) for target in range(len(card.targets))]
 			except:
 				actions += [(2, i, None)]
-		#if player.hero.power.can_use():
-		#	actions += [(3, None, target) for target in range(len(player.hero.power.power_targets()))]
+		if player.hero.power.can_use():
+			if player.hero.power.allowed_targets() is None:
+				actions += [(3, None, None)]
+			else:
+				actions += [(3, None, target) for target in range(len(player.hero.power.allowed_targets()))]
+				# print("Power can target: " + str(player.hero.power.allowed_targets()))
 		actions += ["No_Action"]
 		#if len(actions) > 5:
 		#   print("action_size: " + str(len(actions)))
@@ -73,7 +85,7 @@ class GameHelper:
 		return targets
 
 	def execute(game, action):
-		#try: 
+		try: 
 			if action == "No_Action": return
 			machine = FixedActionAgent(*action)
 			agent_backup = game.current_player.agent
@@ -81,15 +93,15 @@ class GameHelper:
 			machine.do_turn(game.current_player)
 			game.current_player.agent = agent_backup
 			return True
-		#except Exception as e:
+		except Exception as e:
 			# game.current_player.agent = agent_backup
-		#	print("Excecution Error: " + str(e))
+			print("Excecution Error: " + str(e))
 			# print("System stack: " + sys.exc_info()[0])
-		#	raise # bacause the first action fails means that the action we found is erronous
-		#	return False
+			#raise # bacause the first action fails means that the action we found is erronous
+			return False
 
 	def hashgame(game):
 		return tuple(feature_extractor(game.current_player)).__hash__()
 
 	def game_to_json(game):
-		return json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1)
+		return json.dumps(game.__to_json__(), default=lambda o: o.__to_json__(), indent=1)
