@@ -79,5 +79,4 @@ if __name__ == "__main__":
 	# ql.explore_prob = 0.0
 	# ql.learn = False
 	# run_agent(ql, None, int(sys.argv[2]))
-	run_agent(StrategyAgent(), TradeAgent(), int(sys.argv[1]))
-
+	run_agent(TradeAgent(), StrategyAgent(), int(sys.argv[1]))
