@@ -6,8 +6,11 @@ from learning.function_approximator import *
 import json
 
 class StrategyAgent(DoNothingAgent):
-	def __init__(self): # eta, explore_prob, discount, feature_extractor, learn = True):
+	def __init__(self, function_approximator = None): # eta, explore_prob, discount, feature_extractor, learn = True):
 		super().__init__()
+		if function_approximator is None:
+			function_approximator = BasicFunctionApproximator()
+		self.function_approximator = function_approximator		
 
 	def do_card_check(self, cards):
 		return [True, True, True, True]
@@ -19,7 +22,7 @@ class StrategyAgent(DoNothingAgent):
 
 			self.action = self.decide(game)
 			GameHelper.execute(game, self.action)
-			# print("Me: " + str(player.hero.health) + " Him: " + str(game.other_player.hero.health))
+			print("Me: " + str(player.hero.health) + " Him: " + str(game.other_player.hero.health))
 			if self.action == "No_Action":
 				return
 
@@ -51,7 +54,7 @@ class StrategyAgent(DoNothingAgent):
 		for action in actions:
 			new_game = game.copy()
 			GameHelper.execute(new_game, action)
-			new_value = BasicFunctionApproximator.eval(None, new_game)
+			new_value = self.function_approximator.eval(None, new_game)
 			if new_value > max_value:
 				max_value = new_value
 				max_action = action

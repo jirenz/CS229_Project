@@ -73,6 +73,8 @@ class Game(Bindable):
         self.winner = None # added winner 
         self.name = "game"
         self.tracking = False
+        self.save_history = False
+        self.history = []
 
     def random_draw(self, cards, requirement):
         filtered_cards = [card for card in filter(requirement, cards)]
@@ -145,6 +147,12 @@ class Game(Bindable):
         self.start()
         Bindable.verbose = False
 
+    def start_with_history(self):
+        self.save_history = True
+        self.start()
+        self.save_history = False
+        return self.history
+
     def play_single_turn(self):
         self._start_turn()
         # if self.verbose:
@@ -156,6 +164,9 @@ class Game(Bindable):
         self.current_player.agent.do_turn(self.current_player)
         if self.game_ended:
             self.trigger("game_ended", self.winner)
+        else:
+            if self.save_history:
+                self.history.append(self.copy())
         self._end_turn()
 
     def _start_turn(self):
@@ -252,6 +263,9 @@ class Game(Bindable):
 
         for secret in copied_game.other_player.secrets:
             secret.activate(copied_game.other_player)
+        # copied_game does not need history
+        copied_game.save_history = False
+        copied_game.history = []
         return copied_game
 
     def play_card(self, card):
