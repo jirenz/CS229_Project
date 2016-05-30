@@ -99,7 +99,7 @@ class GameHelper:
 			# game.current_player.agent = agent_backup
 			print("Excecution Error: " + str(e))
 			# print("System stack: " + sys.exc_info()[0])
-			raise # bacause the first action fails means that the action we found is erronous
+			#raise # bacause the first action fails means that the action we found is erronous
 			return False
 
 	def hashgame(game):

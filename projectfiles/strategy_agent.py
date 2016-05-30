@@ -17,6 +17,7 @@ class StrategyAgent(DoNothingAgent):
 		self.player = player
 		game = player.game
 		while True:
+
 			self.action = self.decide(game)
 			GameHelper.execute(game, self.action)
 			# print("Me: " + str(player.hero.health) + " Him: " + str(game.other_player.hero.health))

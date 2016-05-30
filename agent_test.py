@@ -34,7 +34,7 @@ def spark_weights(weights):
 		print(line)
 
 def test_agent_once(one, other = None):
-	print("game_started")
+	#print("game_started")
 	generator = RandomDeckGenerator()
 	deck1 = generator.generate()
 	deck2 = deck1.copy()
@@ -47,10 +47,10 @@ def test_agent_once(one, other = None):
 	try:
 		new_game.start()
 	except Exception as e:
-		print("Game error: " + str(e))
+	#	print("Game error: " + str(e))
 		#print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
 		del new_game
-		raise
+		# raise
 		return False
 	print("winning agent: " + new_game.winner.agent.__class__.__name__)
 	# spark_weights(ql.weights)
@@ -71,9 +71,9 @@ def run_agent(one, other, number):
 		else:
 			print("Error")
 			err += 1
-			if err > 5:
-				print("Aborting after 5 errors.")
-				break
+			#if err > 100:
+			#	print("Aborting after 5 errors.")
+			#	break
 	print(winning_count)
 
 

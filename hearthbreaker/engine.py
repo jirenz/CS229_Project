@@ -148,7 +148,7 @@ class Game(Bindable):
     def play_single_turn(self):
         self._start_turn()
         # if self.verbose:
-        print("Currently at turn: " + str(self._turns_passed))
+        # print("Currently at turn: " + str(self._turns_passed))
         # self.current_player.agent.do_turn(self.current_player)
         self.counter_inturn = 0
         if self.tracking: #must have logger when game is tracked
@@ -572,7 +572,7 @@ class Deck:
         self.left = 30
 
     def copy(self):
-        def copy_card(card):
+        def copy_card(card):       	
             try:
                 new_card = type(card)()
             except Exception as e:

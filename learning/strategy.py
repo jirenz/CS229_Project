@@ -2,7 +2,6 @@ from projectfiles.util import GameHelper, FixedActionAgent
 import collections
 import numpy as np
 import random
-
 from collections import deque
 import heapq
 
@@ -35,14 +34,17 @@ class StrategyNode():
 			outcome += strategy.get_outcomes()
 		return outcome
 
-	def get_optimal(self, approximator, original_state, ans_path):
+	def get_optimal(self, approximator, original_state, ans_pair):
 		if self.visited: return
 		value = approximator(original_state, self.game)
-		if (value > ans_path[0]):
-			ans_path[0] = value
-			ans_path[1] = self.game
+		if (value > ans_pair[0]):
+			ans_pair[0] = value
+			ans_pair[1] = self.game
+		ans_pair[2] += 1
+		if (ans_pair[2] > 100): return
 		for [action, strategy] in self.substrategies:
-			strategy.get_optimal(approximator, original_state, ans_path)
+			strategy.get_optimal(approximator, original_state, ans_pair)
+			if (ans_pair[2] > 100): return
 
 class StrategyManager():
 	def __init__(self):
