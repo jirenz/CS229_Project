@@ -3,9 +3,12 @@ import numpy as np
 def feature_extractor_2(game, next_game, action):
 	player = game.current_player
 	oppo = player.opponent
-	oppo_next = next_game.current_player
-	player_next = oppo_next.opponent
-	# print(player, oppo, oppo_next, player_next)
+	player_next = next_game.current_player
+	oppo_next = player_next.opponent
+	if player.name != player_next.name:
+		player_next, oppo_next = oppo_next, player_next
+	# print("EXTRACT", player.name, player_next.name, oppo.name, oppo_next.name)
+	assert(player.name == player_next.name)
 
 	feat = {}
 

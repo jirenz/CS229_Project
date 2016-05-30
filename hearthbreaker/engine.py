@@ -573,7 +573,10 @@ class Deck:
 
     def copy(self):
         def copy_card(card):
-            new_card = type(card)()
+            try:
+                new_card = type(card)()
+            except Exception as e:
+                print("Died at engine.py 577 card is ", card, " ", type(card).__class__.__name__)
             new_card.drawn = card.drawn
             return new_card
         new_deck = Deck.__new__(Deck)

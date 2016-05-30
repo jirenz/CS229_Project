@@ -23,7 +23,7 @@ class HearthstoneMDP(learning.mdp.MDP):
 	def is_end_state(self, state):
 		return state.game_ended
 
-	def getActions(self, state, max_actions = 10):
+	def getActions(self, state):
 		# An "action" is actually parametrized directly by the state corresponding
 		# to the current player's actions. The strategy object enumerates a list of
 		# possible actions
@@ -36,7 +36,7 @@ class HearthstoneMDP(learning.mdp.MDP):
 		return self.strategy.getBestAction(state.copy(), heuristic)
 
 	def getSuccAndReward(self, state, next_action):
-		next_state = next_action.copy()
+		next_state = next_action
 
 		reward = 0.0
 		if next_state.game_ended:
@@ -50,7 +50,7 @@ class HearthstoneMDP(learning.mdp.MDP):
 		return (next_state, reward)
 
 	def getReward(self, event):
-		return {"win" : 100, "lose" : -100, "tie" : 10}[event]
+		return {"win" : 1, "lose" : 0, "tie" : 0.1}[event]
 	
 	def getDiscount(self):
 		return 0.9 #?
@@ -64,7 +64,6 @@ class StatePairLinearModel:
 	def __call__(self, state, action):
 		# the action is a state!
 		next_state = action
-
 		return self.eval(state, next_state)
 
 	def eval(self, state, next_state):
@@ -116,10 +115,10 @@ class FinalStateLinearModel:
 		return self.eval(state, next_state)
 
 	def eval(self, state, next_state):
-		return np.dot(self.weights, self.feature_extractor(next_state))
+		return np.dot(self.weights, self.feature_extractor(next_state.current_player))
 
 	def update(self, state, next_state, delta):
-		phi = self.feature_extractor(next_state)
+		phi = self.feature_extractor(next_state.current_player)
 		self.weights += delta * phi
 		self.weights /= np.sqrt(np.dot(self.weights, self.weights)) + 1e-6
 
