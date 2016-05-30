@@ -50,8 +50,8 @@ class GameHelper:
 				actions += [(2, i, target) for target in range(len(card.targets))]
 			except:
 				actions += [(2, i, None)]
-		#if player.hero.power.can_use():
-		#	actions += [(3, None, None)]
+		if player.hero.power.can_use():
+			actions += [(3, None, target) for target in player.hero.power.power_targets()]
 		actions += ["No_Action"]
 		#if len(actions) > 5:
 		#   print("action_size: " + str(len(actions)))
