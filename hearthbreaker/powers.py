@@ -28,7 +28,6 @@ class DruidPower(Power):
         self.hero.change_temp_attack(1)
         self.hero.increase_armor(1)
 
-
 class HunterPower(Power):
     def use(self):
         if self.hero.power_targets_minions:

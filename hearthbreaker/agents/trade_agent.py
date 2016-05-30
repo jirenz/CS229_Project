@@ -13,6 +13,7 @@ class BattlecryType:
         res = None
 
         if hasattr(card, 'battlecry') and card.battlecry:
+            print(card.battlecry, card.name, card.ref_name)
             for battlecry in card.battlecry:
                 for action in battlecry.actions:
                     # TODO add more battlecries here
