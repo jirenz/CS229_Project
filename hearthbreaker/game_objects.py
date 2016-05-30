@@ -832,7 +832,7 @@ class Weapon(Bindable, GameObject):
 
 
 class Minion(Character):
-    def __init__(self, attack, health,
+    def __init__(self, attack=1, health=1,
                  deathrattle=None, taunt=False, charge=False, spell_damage=0, divine_shield=False, stealth=False,
                  windfury=False, spell_targetable=True, effects=None, auras=None, buffs=None,
                  enrage=None):
