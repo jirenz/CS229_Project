@@ -15,7 +15,7 @@ class FixedActionAgent(Agent):
 		return [True, True, True, True]
 
 	def do_turn(self, player):
-		print("Machine do turn")
+		# print("Machine do turn")
 		if self.chosen_index == 0:
 			player.minions[self.entity_index].attack()
 		elif self.chosen_index == 1:
@@ -26,18 +26,21 @@ class FixedActionAgent(Agent):
 			player.hero.power.use()
 
 	def choose_target(self, targets):
-		print("Machine choose target")
-		if self.target_index is not None:
+		# print("Targets: " + str(targets))
+		# print("My index: " + str(self.target_index))
+		# print("Hero: " + str(self.player.hero))
+		# print("Machine choose target")
+		if self.target_index is not None and self.target_index < len(targets):
 			return targets[self.target_index]
 		else:
 			return targets[random.randint(0, len(targets) - 1)]
 
 	def choose_index(self, card, player):
-		print("Machine choose minion index")
+		# print("Machine choose minion index")
 		return self.minion_position_index
 
 	def choose_option(self, options, player):
-		print("Machine choose option")
+		# print("Machine choose option")
 		return options[random.randint(0, len(options) - 1)]
 
 class GameHelper:
@@ -46,7 +49,7 @@ class GameHelper:
 		if game.game_ended: return []
 		actions = []
 		enemy_targets = GameHelper.get_enemy_targets(player)
-		for i, attack_minion in filter(lambda p: p[1].can_attack(), enumerate(player.minions)):
+		for i, attack_minion in filter(lambda p: p[1].can_attack() and not p[1].frozen, enumerate(player.minions)):
 			actions += [(0, i, target) for target in range(len(enemy_targets))]
 		if player.hero.can_attack():
 			actions += [(1, None, target) for target in range(len(enemy_targets))]
@@ -60,6 +63,7 @@ class GameHelper:
 				actions += [(3, None, None)]
 			else:
 				actions += [(3, None, target) for target in range(len(player.hero.power.allowed_targets()))]
+				# print("Power can target: " + str(player.hero.power.allowed_targets()))
 		actions += ["No_Action"]
 		#if len(actions) > 5:
 		#   print("action_size: " + str(len(actions)))
