@@ -15,7 +15,7 @@ class FixedActionAgent(Agent):
 		return [True, True, True, True]
 
 	def do_turn(self, player):
-		print("Machine do turn")
+		# print("Machine do turn")
 		if self.chosen_index == 0:
 			player.minions[self.entity_index].attack()
 		elif self.chosen_index == 1:
@@ -26,21 +26,23 @@ class FixedActionAgent(Agent):
 			player.hero.power.use()
 
 	def choose_target(self, targets):
-		print("Machine choose target")
+		# print("Machine choose target")
 		if self.target_index is not None:
 			return targets[self.target_index]
 		else:
 			return targets[random.randint(0, len(targets) - 1)]
 
 	def choose_index(self, card, player):
-		print("Machine choose minion index")
+		# print("Machine choose minion index")
 		return self.minion_position_index
 
 	def choose_option(self, options, player):
-		print("Machine choose option")
+		# print("Machine choose option")
 		return options[random.randint(0, len(options) - 1)]
 
 class GameHelper:
+	NO_ACTION = "NO_ACTION"
+
 	def generate_actions(game):
 		player = game.current_player
 		if game.game_ended: return []
@@ -60,7 +62,7 @@ class GameHelper:
 				actions += [(3, None, None)]
 			else:
 				actions += [(3, None, target) for target in range(len(player.hero.power.allowed_targets()))]
-		actions += ["No_Action"]
+		actions += [GameHelper.NO_ACTION]
 		#if len(actions) > 5:
 		#   print("action_size: " + str(len(actions)))
 		return actions
@@ -82,7 +84,7 @@ class GameHelper:
 
 	def execute(game, action):
 		try: 
-			if action == "No_Action": return
+			if action == GameHelper.NO_ACTION: return
 			machine = FixedActionAgent(*action)
 			agent_backup = game.current_player.agent
 			game.current_player.agent = machine

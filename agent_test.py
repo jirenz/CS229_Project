@@ -22,6 +22,8 @@ from projectfiles.feature_extract_2 import *
 from projectfiles.strategy_agent import *
 from learning.function_approximator import *
 
+import numpy as np
+
 def spark_weights(weights):
 	W = weights - np.min(weights)
 	W = W * 30 / np.max(W)
@@ -79,5 +81,10 @@ if __name__ == "__main__":
 	# ql.explore_prob = 0.0
 	# ql.learn = False
 	# run_agent(ql, None, int(sys.argv[2]))
-	run_agent(TradeAgent(), StrategyAgent(), int(sys.argv[1]))
+
+	with open("ql_phi2_weights", "rb") as f:
+		weights = np.load(f)
+	
+	model = StatePairLinearModel(weights, feature_extractor_2_temporary)
+	run_agent(TradeAgent(), StrategyAgent(model), int(sys.argv[1]))
 	# ,

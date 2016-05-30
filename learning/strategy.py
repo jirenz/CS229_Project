@@ -74,8 +74,8 @@ class StrategyManager():
 			if len(actions) == 0:
 				break
 
-			action = random.choice(actions + ["NO_ACTION"])
-			if action == "NO_ACTION":
+			action = random.choice(actions)
+			if action == GameHelper.NO_ACTION:
 				break
 			else:
 				GameHelper.execute(outcome, action)

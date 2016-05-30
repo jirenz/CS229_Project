@@ -25,5 +25,8 @@ if __name__ == "__main__":
 		explore_prob = 0.2,
 		function_approximator = model)
 
-
 	ql.train(10)
+
+	with open("ql_phi2_weights", "wb") as f:
+		np.save(f, model.weights)
+
