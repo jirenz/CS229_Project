@@ -50,8 +50,8 @@ class GameHelper:
 				actions += [(2, i, target) for target in range(len(card.targets))]
 			except:
 				actions += [(2, i, None)]
-		if player.hero.power.can_use():
-			actions += [(3, None, None)]
+		#if player.hero.power.can_use():
+		#	actions += [(3, None, None)]
 		actions += ["No_Action"]
 		#if len(actions) > 5:
 		#   print("action_size: " + str(len(actions)))
@@ -73,7 +73,7 @@ class GameHelper:
 		return targets
 
 	def execute(game, action):
-		try: 
+		#try: 
 			if action == "No_Action": return
 			machine = FixedActionAgent(*action)
 			agent_backup = game.current_player.agent
@@ -81,12 +81,12 @@ class GameHelper:
 			machine.do_turn(game.current_player)
 			game.current_player.agent = agent_backup
 			return True
-		except Exception as e:
+		#except Exception as e:
 			# game.current_player.agent = agent_backup
-			print("Excecution Error: " + str(e))
+		#	print("Excecution Error: " + str(e))
 			# print("System stack: " + sys.exc_info()[0])
-			raise # bacause the first action fails means that the action we found is erronous
-			return False
+		#	raise # bacause the first action fails means that the action we found is erronous
+		#	return False
 
 	def hashgame(game):
 		return tuple(feature_extractor(game.current_player)).__hash__()

@@ -39,13 +39,13 @@ def test_agent_once(one, other = None):
 		#other = RandomAgent()
 	game = Game([deck1, deck2], [one, other])
 	new_game = game.copy()
-	try:
-		new_game.start()
-	except Exception as e:
-		print("Game error" + str(e))
+	#try:
+	new_game.start()
+	#except Exception as e:
+	#	print("Game error: " + str(e))
 		#print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
-		del new_game
-		return False
+	#	del new_game
+	#	return False
 	print("winning agent: " + new_game.winner.agent.__class__.__name__)
 	# spark_weights(ql.weights)
 	return new_game.winner.agent.__class__.__name__
@@ -79,4 +79,4 @@ if __name__ == "__main__":
 	# ql.learn = False
 	# run_agent(ql, None, int(sys.argv[2]))
 	run_agent(StrategyAgent(), TradeAgent(), int(sys.argv[1]))
-	# ,
+
