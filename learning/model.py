@@ -114,6 +114,8 @@ class FinalStateLinearModel(LinearModel):
 		assert(isinstance(self.feature_extractor, StateFeatureExtractor))
 
 	def eval(self, state, next_state):
+		if next_state.current_player_win(): return 1e9
+		if next_state.current_player_lose(): return -1e9
 		return np.dot(self.weights, self.feature_extractor(next_state))
 
 	def train(self, dataset):

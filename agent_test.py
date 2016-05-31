@@ -38,11 +38,13 @@ def test_agent_once(one, other = None):
 	try:
 		new_game.start()
 	except Exception as e:
-	#	print("Game error: " + str(e))
+		print("Game error: " + str(e))
+		raise e
+		# raise
 		#print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
-		del new_game
-		raise
+		# new_game
 		return False
+	print("Game lasted: " + str(new_game._turns_passed))
 	print("winning agent: " + new_game.winner.agent.name)
 	# spark_weights(ql.weights)
 	return new_game.winner.agent.name
