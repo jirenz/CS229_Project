@@ -5,6 +5,7 @@ import random
 
 from projectfiles.game_history_generator import *
 from sklearn import linear_model
+from projectfiles.pear_extractor import *
 
 class BasicFunctionApproximator:
 	def __init__(self):
@@ -41,16 +42,22 @@ class SimpleExtractor:
 	
 class LinearFunctionApproximator(BasicFunctionApproximator):
 	def __init__(self, initial_weights = None):
-		self.extractor = ResourceExtractor()
-		if initial_weights is None:
-			self.weights = self.extractor.get_initial()
-		else:
-			self.weights = initial_weights
+		self.extractor = PearExtractor()
+		self.weights = [0.026,0.007,-0.004,0.046,0.005,-0.021,0.052,0.003,
+		-0.001,0.036,0.003,0.080,0.021,0.008,0.089,0.082,-0.028,
+		-0.100,0.025,-0.009,0.037,0.004,0.018,-0.019,-0.010,0.014,-0.025,-0.005,
+		0.014,-0.039,-0.007,0.008,-0.020,-0.007,-0.073,
+		-0.032,-0.004,-0.016,-0.038,-0.014,0.059,-0.032,0.011,-0.056,-0.003,-0.022]
+		#if initial_weights is None:
+		#	self.weights = self.extractor.get_initial()
+		#else:
+		#	self.weights = initial_weights
 
 	def __call__(self, state):
 		return np.dot(self.extractor(state), self.weights)
 
 	def eval(self, state_1, state_2):
+		#print(len(self.extractor(state_2)), len(self.weights))
 		return np.dot(self.extractor(state_2), self.weights)
 
 	def train(self, numgames):

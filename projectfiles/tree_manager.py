@@ -85,7 +85,7 @@ class ActionTreeManager():
             for child in node.children:
                 q.put(child)
 
-    def think_depth(self, depth = 2):
+    def think_depth(self, depth = 0):
         if self.root is None: raise("Unnitialized root for growing.")
         q = queue.Queue()
         q.put(self.root)
