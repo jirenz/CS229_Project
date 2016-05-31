@@ -109,6 +109,7 @@ class TradeAgent(TradeMixin, AttackMixin, PlayMixin, ChooseTargetMixin, DoNothin
 		super().__init__()
 		self.current_trade = None
 		self.last_card_played = NullCard()
+		self.name = "Trade Agent"
 
 	def do_turn(self, player):
 		self.player = player
