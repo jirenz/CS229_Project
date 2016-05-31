@@ -49,9 +49,9 @@ def test_agent_once(one, other = None):
 		del new_game
 		raise
 		return False
-	print("winning agent: " + new_game.winner.agent.__class__.__name__)
+	print("winning agent: " + new_game.winner.agent.name)
 	# spark_weights(ql.weights)
-	return new_game.winner.agent.__class__.__name__
+	return new_game.winner.agent.name
 
 def run_agent(one, other, number):
 	i = 0
@@ -81,8 +81,9 @@ if __name__ == "__main__":
 	# ql.explore_prob = 0.0
 	# ql.learn = False
 	# run_agent(ql, None, int(sys.argv[2]))
-	approximator = LinearFunctionApproximator()
-	print("Training")
-	approximator.train(int(sys.argv[1]))
+	approximator1 = LinearFunctionApproximator()
+	approximator2 = BasicFunctionApproximator()
+	#print("Training")
+	#approximator.train(int(sys.argv[1]))
 	print("Testing")
-	run_agent(TradeAgent(), StrategyAgent(approximator), int(sys.argv[2]))
+	run_agent(StrategyAgent(approximator1, 'Linear'), StrategyAgent(approximator2, 'Heuristic'), int(sys.argv[2]))

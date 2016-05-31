@@ -6,8 +6,9 @@ from learning.function_approximator import *
 import json
 
 class StrategyAgent(DoNothingAgent):
-	def __init__(self, function_approximator = None): # eta, explore_prob, discount, feature_extractor, learn = True):
+	def __init__(self, function_approximator = None, name = 'StrategyAgent'): # eta, explore_prob, discount, feature_extractor, learn = True):
 		super().__init__()
+		self.name = name;
 		if function_approximator is None:
 			function_approximator = BasicFunctionApproximator()
 		self.function_approximator = function_approximator		
