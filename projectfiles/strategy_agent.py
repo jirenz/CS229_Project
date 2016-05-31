@@ -21,11 +21,10 @@ class StrategyAgent(DoNothingAgent):
 		self.player = player
 		game = player.game
 		while True:
-
 			self.action = self.decide(game)
 			GameHelper.execute(game, self.action)
-			print("Me: " + str(player.hero.health) + " Him: " + str(game.other_player.hero.health))
 			if self.action == GameHelper.NO_ACTION:
+				print("Me: " + str(player.hero.health) + " Opponent: " + str(game.other_player.hero.health))
 				return
 
 	def choose_target(self, targets):
@@ -52,7 +51,8 @@ class StrategyAgent(DoNothingAgent):
 	def decide(self, game):
 		manager = ActionTreeManager()
 		manager.encounter(game)
-		manager.think_depth()
+		manager.think_2(self.function_approximator)
+		# manager.think_1(function_approximator = self.function_approximator)
 		return manager.find_best_action(self.function_approximator)
 		# max_value = -1000
 		# max_action = GameHelper.NO_ACTION

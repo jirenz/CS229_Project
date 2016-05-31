@@ -58,6 +58,8 @@ class LinearFunctionApproximator(BasicFunctionApproximator):
 
 	def eval(self, state_1, state_2):
 		#print(len(self.extractor(state_2)), len(self.weights))
+		if state_2.current_player_win(): return 100000000
+		if state_2.current_player_lose(): return -100000000
 		return np.dot(self.extractor(state_2), self.weights)
 
 	def train(self, numgames):
