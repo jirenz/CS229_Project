@@ -9,7 +9,11 @@ class StatePairFeatureExtractor:
 		raise NotImplementedError("")
 
 	def get_initial(self):
-		raise NotImplementedError("")
+		generator = RandomDeckGenerator()
+		deck1 = generator.generate()
+		deck2 = deck1.copy()
+		game = Game([deck1, deck2], [RandomAgent(), RandomAgent()])
+		return np.zeros(self.__call__(game, game).shape)
 
 	def debug(self, extracted):
 		raise NotImplementedError("")
@@ -19,7 +23,11 @@ class StateFeatureExtractor:
 		raise NotImplementedError("")
 
 	def get_initial(self):
-		raise NotImplementedError("")
+		generator = RandomDeckGenerator()
+		deck1 = generator.generate()
+		deck2 = deck1.copy()
+		game = Game([deck1, deck2], [RandomAgent(), RandomAgent()])
+		return np.zeros(self.__call__(game).shape)
 
 	def debug(self, extracted):
 		raise NotImplementedError("")
@@ -47,12 +55,10 @@ class RelativeResourceExtractor(StatePairFeatureExtractor):
 			for i, minion in enumerate(minion_stats + [None] * (8 - len(player.minions))):
 				if minion is not None:
 					attack, health = minion
-					# resources['minion-%d-attack' % i] = attack
-					# resources['minion-%d-health' % i] = health
 				else:
-					pass
-					# resources['minion-%d-attack' % i] = 0
-					# resources['minion-%d-health' % i] = 0
+					attack, health = 0, 0
+				# resources['minion-%d-attack' % i] = attack
+				# resources['minion-%d-health' % i] = health
 			resources['minion-total-attack'] = sum(attack for attack, health in minion_stats)
 			resources['minion-total-health'] = sum(health for attack, health in minion_stats)
 			resources['minion-count'] = len(player.minions)
@@ -97,105 +103,23 @@ class RelativeResourceExtractor(StatePairFeatureExtractor):
 		prefix_update(feat, oppo_gain, 'oppo-gain-')
 		prefix_update(feat, relative_gain, 'relative-gain-')
 
-		# del next_game
-		# print(len(feat))
 		if self.keys is None:
 			self.keys = list(feat.keys())
 			self.keys.sort()
 
 		return np.array([feat[key] for key in self.keys], dtype=np.float64)
 
-	def get_initial(self):
-		generator = RandomDeckGenerator()
-		deck1 = generator.generate()
-		deck2 = deck1.copy()
-		game = Game([deck1, deck2], [RandomAgent(), RandomAgent()])
-		return np.zeros(self.__call__(game, game).shape)
-
 	def debug(self, weights):
-		for i, key in enumerate(self.keys):
-			print(key, ":", weights[i])
+		if self.keys is None:
+			self.get_initial()
 
-class ResourceExtractor(StateFeatureExtractor):
-	def __init__(self):
-		self.keys = []
-		for i in range(7):
-			self.keys += ["pm%d-atk" % i, "pm%d-health" % i, "pm%d-?" % i]
-		self.keys += ["p-health", "p-armor"]
-		for i in range(7):
-			self.keys += ["em%d-atk" % i, "em%d-health" % i, "em%d-?" % i]
-		self.keys += ["e-health", "e-armor"]
-		self.keys += ["p-mana", "e-mana"]
-		self.keys += ["p-current-overload", "e-current-overload"]
-		self.keys += ["p-upcoming-overload", "e-upcoming-overload"]
-		self.keys += ["p-max-mana", "e-max-mana"]
-		self.keys += ["p-deck", "e-deck"]
-		self.keys += ["p-fatigue", "e-fatigue"]
-		self.keys += ["p-spell-damage", "e-spell-damage"]
-		self.keys += ["p-spell-multiplier", "e-spell-multiplier"]
-		self.keys += ["p-heal-multiplier", "e-heal-multiplier"]
-		self.keys += ["p-heal-damage", "e-heal-damage"]
-		self.keys += ["p-cards-played", "e-cards-played"]
-
-	def __call__(self, game):
-		player = game.current_player
-		oppo = player.opponent
-		feat = []
-		
-		# add my own information
-		count = 0
-		tmp = []
-		for i in player.minions:
-			tmp.append([i.calculate_attack(), i.health, 1])
-			count += 1
-		tmp.sort()
-		for i in tmp: feat += i
-		for i in range(0, 7 - count): feat += [0, 0, 0]
-		feat += [player.hero.health, player.hero.armor]
-		
-		# add opponent's information
-		count = 0
-		tmp = []
-		for i in oppo.minions:
-			tmp.append([i.calculate_attack(), i.health, 1])
-			count += 1
-		tmp.sort()
-		for i in tmp: feat += i
-		for i in range(0, 7 - count): feat += [0, 0, 0]
-		# feat += [oppo.hero.health, oppo.hero.armor]
-
-		# add other information
-		feat += [player.mana, oppo.mana]
-		feat += [player.current_overload, oppo.current_overload]
-		feat += [player.upcoming_overload, oppo.upcoming_overload]
-		feat += [player.max_mana, oppo.max_mana]
-		feat += [len(player.deck.cards), len(oppo.deck.cards)]
-		feat += [player.fatigue, oppo.fatigue]
-		feat += [player.spell_damage, oppo.spell_damage]
-		feat += [player.spell_multiplier, oppo.spell_multiplier]
-		feat += [player.heal_multiplier, oppo.heal_multiplier]
-		feat += [player.heal_does_damage, oppo.heal_does_damage]
-		feat += [player.cards_played, oppo.cards_played]
-
-		# print(len(feat))
-		return np.array(feat, dtype=np.float64)
-
-	def get_initial(self):
-		generator = RandomDeckGenerator()
-		deck1 = generator.generate()
-		deck2 = deck1.copy()
-		game = Game([deck1, deck2], [RandomAgent(), RandomAgent()])
-		return np.zeros(self.__call__(game).shape)
-
-	def debug(self, weights):
 		vals = [(val, i) for i, val in enumerate(list(weights))]
 		vals.sort(key=lambda x: abs(x[0]), reverse=True)
 
-		for val, i in vals[:20]:
+		for val, i in vals[:10]:
 			print(self.keys[i], ":", val)
 
-
-class TestResourceExtractor(StateFeatureExtractor):
+class ResourceExtractor(StateFeatureExtractor):
 	def __init__(self):
 		self.keys = None
 
@@ -260,13 +184,6 @@ class TestResourceExtractor(StateFeatureExtractor):
 
 		return np.array([feat[key] for key in self.keys], dtype=np.float64)
 
-	def get_initial(self):
-		generator = RandomDeckGenerator()
-		deck1 = generator.generate()
-		deck2 = deck1.copy()
-		game = Game([deck1, deck2], [RandomAgent(), RandomAgent()])
-		return np.zeros(self.__call__(game).shape)
-
 	def debug(self, weights):
 		if self.keys is None:
 			self.get_initial()
@@ -274,5 +191,72 @@ class TestResourceExtractor(StateFeatureExtractor):
 		vals = [(val, i) for i, val in enumerate(list(weights))]
 		vals.sort(key=lambda x: abs(x[0]), reverse=True)
 
-		for val, i in vals[:20]:
+		for val, i in vals[:10]:
 			print(self.keys[i], ":", val)
+
+class SimpleExtractor(StateFeatureExtractor):
+	def __init__(self):
+		pass
+
+	def __call__(self, game):
+		player = game.current_player
+		attack = 0;
+		health = 0;
+		for i in player.minions:
+			attack += i.calculate_attack()
+			health += i.health
+		feat = [attack, health]
+		feat.append(len(player.hand))
+		feat.append(player.hero.health + player.hero.armor)
+		feat.append(player.game.other_player.hero.health)
+		return np.array(feat, dtype=np.float64)
+
+	def get_initial():
+		return np.zeros((5, ))
+	
+	def debug(self, weights):
+		print(weights)
+
+class PearExtractor(StateFeatureExtractor):
+	def __init__(self):
+		pass
+
+	def __call__(self, game):
+		player = game.current_player
+		oppo = player.opponent
+		feat = []
+		
+		# add my own information
+		count = 0
+		tmp = []
+		for i in player.minions:
+			tmp.append([i.calculate_attack(), i.health, 1])
+			count += 1
+		tmp.sort()
+		for i in tmp: feat += i
+		for i in range(0, 7 - count): feat += [0, 0, 0]
+		feat += [player.hero.health, player.hero.armor]
+		
+		# add opponent's information
+		count = 0
+		tmp = []
+		for i in oppo.minions:
+			tmp.append([i.calculate_attack(), i.health, 1])
+			count += 1
+		tmp.sort()
+		for i in tmp: feat += i
+		for i in range(0, 7 - count): feat += [0, 0, 0]
+		feat += [oppo.hero.health, oppo.hero.armor]
+
+		return np.array(feat)
+
+	def debug(self, weights):
+		print(weights)
+
+	# this is now saved in linear_pear_extractor_model, no need for the hack
+	# def get_initial(self):
+		# return np.array([0.026,0.007,-0.004,0.046,0.005,-0.021,0.052,0.003,\
+		# -0.001,0.036,0.003,0.080,0.021,0.008,0.089,0.082,-0.028,\
+		# -0.100,0.025,-0.009,0.037,0.004,0.018,-0.019,-0.010,0.014,-0.025,-0.005,\
+		# 0.014,-0.039,-0.007,0.008,-0.020,-0.007,-0.073,\
+		# -0.032,-0.004,-0.016,-0.038,-0.014,0.059,-0.032,0.011,-0.056,-0.003,-0.022])

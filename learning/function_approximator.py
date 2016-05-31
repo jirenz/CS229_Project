@@ -5,7 +5,9 @@ import random
 
 from projectfiles.game_history_generator import *
 from sklearn import linear_model
-from projectfiles.pear_extractor import *
+# from projectfiles.pear_extractor import *
+
+print("function_approximator.py is deprecated")
 
 class BasicFunctionApproximator:
 	def __init__(self):
@@ -38,7 +40,6 @@ class SimpleExtractor:
 
 	def initial():
 		return np.zeros((5, ))
-
 	
 class LinearFunctionApproximator(BasicFunctionApproximator):
 	def __init__(self, initial_weights = None):

@@ -8,25 +8,25 @@ from projectfiles.random_deck_generator import RandomDeckGenerator
 from projectfiles.deck_loader import DeckLoader
 from projectfiles.hearthlogger import Hearthlogger
 
-class GameHistoryGenerator():
-    def __call__(self, numgames):
-        return self.generate(numgames)
+class GameHistoryGenerator:
+    def __init__(self):
+        pass
 
-    def generate(self, numgames):
+    def generate(self, numgames, agent1 = TradeAgent(), agent2 = TradeAgent()):
         i = 0
         games = []
         while i < numgames:
-            results = self.generate_one()
+            results = self.generate_one(agent1, agent2)
             if not results is None:
                 games += results
                 i += 1
         return games
 
-    def generate_one(self):
+    def generate_one(self, agent1, agent2):
         generator = RandomDeckGenerator()
         deck1 = generator.generate()
         deck2 = deck1.copy()
-        game = Game([deck1, deck2], [TradeAgent(), TradeAgent()])
+        game = Game([deck1, deck2], [agent1, agent2])
         try:
             history = game.start_with_history()
         except Exception as e:
