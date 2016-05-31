@@ -5,7 +5,7 @@ import queue
 from projectfiles.util import *
 
 class ActionTreeNode():
-    def __init__(self, game_state, state_set = None, parent = None, action = GameHelper.NO_ACTION) # , function_approximator = None):
+    def __init__(self, game_state, state_set = None, parent = None, action = GameHelper.NO_ACTION): # , function_approximator = None):
         self.game = game_state
         self.parent = parent
         self.action = action
@@ -22,12 +22,31 @@ class ActionTreeNode():
     def generate_children(self):
         actions = GameHelper.generate_actions(self.game)
         for action in actions:
-            new_game = game.copy()
+            new_game = self.game.copy()
             GameHelper.execute(new_game, action)
-            new_game_hash = GameHelper.hashgame(game);
+            new_game_hash = GameHelper.hashgame(new_game);
             if not (new_game_hash in self.state_set):
                 self.state_set.add(new_game_hash)
                 self.children.append(ActionTreeNode(game_state = new_game, parent = self, action = action))
+
+    def find_best_action(self, function_approximator):
+        max_value = function_approximator(self.game)
+        max_action = GameHelper.NO_ACTION
+        for child in self.children:
+            new_value = child.eval(function_approximator)
+            if new_value > max_value:
+                max_value = new_value
+                max_action = child.action
+        print("Max value: " + str(max_value))
+        return max_action
+
+    def eval(self, function_approximator):
+        max_value = function_approximator(self.game)
+        for child in self.children:
+            new_value = child.eval(function_approximator)
+            if new_value > max_value:
+                max_value = new_value
+        return max_value
 
     def get_outcomes(self):
         if self.visited: return []
@@ -57,7 +76,7 @@ class ActionTreeManager():
         self.root = ActionTreeNode(game_state = game_state, state_set = self.state_set)
 
     def think_fully(self):
-        if self.root = None raise("Unnitialized root for growing.")
+        if self.root is None: raise("Unnitialized root for growing.")
         q = queue.Queue()
         q.put(self.root)
         while not q.empty():
@@ -66,6 +85,19 @@ class ActionTreeManager():
             for child in node.children:
                 q.put(child)
 
+    def think_depth(self, depth = 2):
+        if self.root is None: raise("Unnitialized root for growing.")
+        q = queue.Queue()
+        q.put(self.root)
+        while not q.empty():
+            # print("advance!")
+            node = q.get()
+            if node.depth <= depth:
+                node.generate_children()
+                for child in node.children:
+                    q.put(child)
+
+    #deprecated
     def branch_think(self, branching_decider = None):
         if branching_decider is None:
             branching_decider = BasicBrachingDecider()
@@ -74,8 +106,12 @@ class ActionTreeManager():
         self.state_set = set()
         self.root = None
 
+    def find_best_action(self, function_approximator):
+        return self.root.find_best_action(function_approximator)
+
 class BasicBrachingDecider():
     def __init__(self, base_factor = 20):
         self.base_factor = base_factor
 
-    def decide(self, )
+    def decide(self):
+        pass

@@ -4,6 +4,7 @@ from projectfiles.feature_extract import *
 from learning.strategy import *
 from learning.function_approximator import *
 import json
+from projectfiles.tree_manager import *
 
 class StrategyAgent(DoNothingAgent):
 	def __init__(self, function_approximator = None): # eta, explore_prob, discount, feature_extractor, learn = True):
@@ -48,15 +49,19 @@ class StrategyAgent(DoNothingAgent):
 		return options[random.randint(0, len(options) - 1)]
 
 	def decide(self, game):
-		max_value = -1000
-		max_action = GameHelper.NO_ACTION
-		actions = GameHelper.generate_actions(game)
-		for action in actions:
-			new_game = game.copy()
-			GameHelper.execute(new_game, action)
-			new_value = self.function_approximator.eval(None, new_game)
-			if new_value > max_value:
-				max_value = new_value
-				max_action = action
+		manager = ActionTreeManager()
+		manager.encounter(game)
+		manager.think_depth()
+		return manager.find_best_action(self.function_approximator)
+		# max_value = -1000
+		# max_action = GameHelper.NO_ACTION
+		# actions = GameHelper.generate_actions(game)
+		# for action in actions:
+		#	new_game = game.copy()
+		#	GameHelper.execute(new_game, action)
+		#	new_value = self.function_approximator.eval(None, new_game)
+		#	if new_value > max_value:
+		#		max_value = new_value
+		#		max_action = action
 		# print("BEST:", max_action, max_value)
 		return max_action

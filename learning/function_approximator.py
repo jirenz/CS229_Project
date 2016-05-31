@@ -6,8 +6,6 @@ import random
 from projectfiles.game_history_generator import *
 from sklearn import linear_model
 
-
-
 class BasicFunctionApproximator:
 	def __init__(self):
 		pass
@@ -49,6 +47,9 @@ class LinearFunctionApproximator(BasicFunctionApproximator):
 		else:
 			self.weights = initial_weights
 
+	def __call__(self, state):
+		return np.dot(self.extractor(state), self.weights)
+
 	def eval(self, state_1, state_2):
 		return np.dot(self.extractor(state_2), self.weights)
 
@@ -64,6 +65,7 @@ class LinearFunctionApproximator(BasicFunctionApproximator):
 		self.weights = clf.coef_
 		print(self.weights)
 
+# deprecated
 	def update(self, game, score, delta):
 		phi = self.extractor(game)
 		original_score = np.dot(self.weights, phi)
