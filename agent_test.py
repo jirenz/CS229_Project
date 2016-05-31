@@ -86,4 +86,4 @@ if __name__ == "__main__":
 	#print("Training")
 	#approximator.train(int(sys.argv[1]))
 	print("Testing")
-	run_agent(StrategyAgent(approximator1, 'Linear'), StrategyAgent(approximator2, 'Heuristic'), int(sys.argv[2]))
+	run_agent(StrategyAgent(approximator1, 'Linear'), TradeAgent(), int(sys.argv[2]))
