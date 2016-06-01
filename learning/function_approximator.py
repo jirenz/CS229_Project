@@ -7,7 +7,7 @@ from projectfiles.game_history_generator import *
 from sklearn import linear_model
 # from projectfiles.pear_extractor import *
 
-print("function_approximator.py is deprecated")
+#print("function_approximator.py is deprecated")
 
 class BasicFunctionApproximator:
 	def __init__(self):
