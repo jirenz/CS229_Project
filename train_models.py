@@ -23,64 +23,61 @@ def experience_replay_train(model, epochs = 10, eta = 0.001, save_file = None):
 
 	ql.train(epochs)
 
-	model.feature_extractor.debug(model.weights)
+	try:
+		model.feature_extractor.debug(model.weights)
+	except:
+		pass
 
 	if save_file is not None:
 		with open(save_file, "wb") as f:
 			pickle.dump(model, f)
 
-def supervised_train(model, epochs = 10, save_file = None):
-	st = SupervisedLearningAlgorithm(
-			model = model,
-			agent1 = TradeAgent(),
-			agent2 = TradeAgent())
+def supervised_train(model, data_file = None, save_file = None):
+	with open(data_file, "rb") as f:
+		training_set = pickle.load(f)
 
-	st.train(epochs)
+	model.train(training_set)
 
-	model.feature_extractor.debug(model.weights)
+	try:
+		model.feature_extractor.debug(model.weights)
+	except:
+		pass
 
 	if save_file is not None:
 		with open(save_file, "wb") as f:
 			pickle.dump(model, f)
 
 if __name__ == "__main__":
-	# RelativeResourceExtractor
+	model_name = sys.argv[1]
 
-	# experience_replay_train( \
-		# model = StatePairLinearModel(RelativeResourceExtractor()), \
-		# epochs = int(sys.argv[1]), \
-		# eta = 0.0001, \
-		# save_file = "ql_sp_relative")
-
-	# ResourceExtractor
-
-	experience_replay_train( \
-		model = StateDifferenceLinearModel(ResourceExtractor()),
-		epochs = int(sys.argv[1]), \
-		eta = 0.0005, \
-		save_file = "ql_sd_resource")
-
-	# nice try, but no
-	# with open("ql_sd_resource", "rb") as f:
-		# model = pickle.load(f)
-	# m2 = FinalStateLinearModel(ResourceExtractor(), model.weights)
-	# with open("ql_sd_resouce_to_fs", "wb") as f:
-		# pickle.dump(m2, f)
-
-	# experience_replay_train( \
-		# model = FinalStateLinearModel(ResourceExtractor()), \
-		# epochs = int(sys.argv[1]), \
-		# eta = 0.0001, \
-		# save_file = "ql_fs_resource")
-
-	# supervised_train( \
-		# model = FinalStateLinearModel(ResourceExtractor()), \
-		# epochs = int(sys.argv[1]), \
-		# save_file = "st_fs_resource")
-
-
-	# PearExtractor
-
+	if model_name.find("ql_sp_relative") != -1:
+		experience_replay_train( \
+			model = StatePairLinearModel(RelativeResourceExtractor()), \
+			epochs = int(sys.argv[2]), \
+			eta = 0.0001, \
+			save_file = model_name)
+	elif model_name.find("ql_fs_resource") != -1:
+		experience_replay_train( \
+			model = FinalStateLinearModel(ResourceExtractor()), \
+			epochs = int(sys.argv[2]), \
+			eta = 0.0001, \
+			save_file = model_name)
+	elif model_name.find("st_fs_resource") != -1:
+		supervised_train( \
+			model = FinalStateLinearModel(ResourceExtractor()), \
+			epochs = int(sys.argv[2]), \
+			save_file = model_name)
+	elif model_name.find("st_fs_neural") != -1:
+		supervised_train( \
+			model = FinalStateNeuralModel(ResourceExtractor()), \
+			data_file = sys.argv[2], \
+			save_file = model_name)
+	elif model_name.find("st_fs_deep_neural") != -1:
+		supervised_train( \
+			model = DeepNeuralModel(ResourceExtractor()), \
+			data_file = sys.argv[2], \
+			save_file = model_name)
+	
 	# experience_replay_train( \
 		# model = StateDifferenceLinearModel(PearExtractor()), \
 		# epochs = int(sys.argv[1]), \
@@ -97,3 +94,9 @@ if __name__ == "__main__":
 		# model = FinalStateLinearModel(PearExtractor()), \
 		# epochs = int(sys.argv[1]), \
 		# save_file = "st_fs_pear")
+
+	# supervised_train(
+		# model = FinalStateLinearModel(ResourceExtractor()), \
+		# data_file = "supervised_data", \
+		# save_file = "st_test")
+

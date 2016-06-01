@@ -9,41 +9,47 @@ from projectfiles.deck_loader import DeckLoader
 from projectfiles.hearthlogger import Hearthlogger
 from projectfiles.feature_extract import *
 
+from learning.model import *
+import numpy as np
+
 class GameHistoryGenerator:
-    #def generate(numgames, agent1 = TradeAgent(), agent2 = TradeAgent()):
-    #    i = 0
-    #    games = []
-    #    while i < numgames:
-    #        results = self.generate_one(agent1, agent2)
-    #        if not results is None:
-    #            games += results
-    #            i += 1
-    #    return games
+	def generate(numgames, agent1 = TradeAgent(), agent2 = TradeAgent(), extractor = ResourceExtractor()):
+		i = 0
+		games = []
+		while i < numgames:
+			result = GameHistoryGenerator.generate_one(agent1, agent2, extractor)
+			if not result is None:
+				print("Generating game", i)
+				games += result
+				i += 1
+		X = np.array([state_vector for state_vector, value in games])
+		y = np.array([value for state_vector, value in games])
+		return X, y
 
-    def generate_one(agent1, agent2):
-        generator = RandomDeckGenerator()
-        deck1 = generator.generate()
-        deck2 = deck1.copy()
-        game = Game([deck1, deck2], [agent1, agent2])
-        try:
-            history = game.start_with_history()
-        except Exception as e:
-            return None
-        if not game.game_ended:
-            return None
-        return self.process_history(history)
+	def generate_one(agent1, agent2, extractor):
+		generator = RandomDeckGenerator()
+		deck1 = generator.generate()
+		deck2 = deck1.copy()
+		game = Game([deck1, deck2], [agent1, agent2])
+		try:
+			history = game.start_with_history()
+		except Exception as e:
+			return None
+		if not game.game_ended:
+			return None
+		return GameHistoryGenerator.process_history(history, game, extractor)
 
-    def process_history(history, game):
-        results = []
-        helper = PearExtractor()
-        for historic_game in history:
-            if game.winner is None:
-                base_reward = 3
-            else:
-                if historic_game.current_player.name == game.winner.name:
-                    base_reward = 10
-                else: 
-                    base_reward = -8
-            value = base_reward * (0.7 ** (game._turns_passed - historic_game._turns_passed))
-            results.append([helper(historic_game), value])
-        return results
+	def process_history(history, game, extractor):
+		results = []
+		for historic_game in history:
+			if game.winner is None:
+				event = "tie"
+			else:
+				if historic_game.current_player.name == game.winner.name:
+					event = "win"
+				else: 
+					event = "lose"
+			base_reward = HearthstoneMDP.getReward(None, event)
+			value = base_reward * (HearthstoneMDP.getDiscount(None) ** (game._turns_passed - historic_game._turns_passed))
+			results.append([extractor(historic_game), value])
+		return results

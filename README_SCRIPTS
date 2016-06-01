@@ -1,0 +1,58 @@
+Now everything is runnable via command line.
+
+Generating data
+---------------
+
+First, generate data for the supervised learning:
+
+	python3 generate_data.py 10 supervised_data
+
+Then we can sample some data from that (especially for plotting k-fold estimates of learning curves)
+For example, to get 5 points out of the 10, a few times
+
+	python3 sample_data.py supervised_data 5 supervised_data_5_1
+	python3 sample_data.py supervised_data 5 supervised_data_5_2
+	...
+
+Training
+--------
+
+Now we can train them on it. The script checks if the correct id is in the model name, so
+we can then also label models by training data size and run id or whatever
+
+	python3 train_models.py st_fs_deep_neural_5_1 supervised_data_5_1
+	python3 train_models.py st_fs_deep_neural_5_2 supervised_data_5_2
+
+This produces the model files st_fs_deep_neural_5_1 and st_fs_deep_neural_5_2.
+
+For q-learning models there's no need for the data, instead give the number of epochs:
+
+	python3 train_models.py ql_fs_resource_1 1
+
+Evaluation
+----------
+
+Now we can evaluate the models. To evaluate the above-trained
+	ql_fs_resource_1
+model against the
+	trade
+agent for 
+	10
+games using a maximum search depth of
+	1
+please run
+
+	python3 agent_test.py ql_fs_resource_1 trade 10 1
+
+This runs the thing, and, this is key, immediately APPENDS the result to a file called "results".
+So, after a few runs, for example
+
+	python3 agent_test.py ql_fs_resource_1 trade 10 1
+	python3 agent_test.py st_fs_deep_neural_5_1 trade 2 2
+
+The results file might contain:
+	
+	ql_fs_resource_1 trade 10 1 => 0
+	st_fs_deep_neural_50_1 trade 2 1 => 1
+
+So this means we can go assign each other to run different parts of the evaluation and combine the results later.

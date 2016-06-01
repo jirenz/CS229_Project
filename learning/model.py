@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn import linear_model
+from sknn.mlp import Regressor, Layer
 import learning.mdp
 
 from projectfiles.random_deck_generator import RandomDeckGenerator
@@ -52,10 +53,10 @@ class HearthstoneMDP(learning.mdp.MDP):
 		return (next_state, reward)
 
 	def getReward(self, event):
-		return {"win" : 10, "lose" : -10, "tie" : 0.1}[event]
+		return {"win" : 10, "lose" : -8, "tie" : 31}[event]
 	
 	def getDiscount(self):
-		return 0.9 #?
+		return 0.8
 
 class Model:
 	def __init__(self):
@@ -70,7 +71,13 @@ class Model:
 		raise NotImplementedError("")
 
 	def update(self, state, next_state, delta):
-		raise NotImplementedError("")
+		assert(state.current_player.name == next_state.current_player.name)
+		print("curplay", state.current_player.name, \
+				"health", state.current_player.hero.health, \
+				"my_next_health", next_state.current_player.hero.health, \
+				"enemy_health", state.current_player.opponent.hero.health, \
+				"enemy_next_heatlh", next_state.current_player.opponent.hero.health, \
+				"delta", delta)
 
 class LinearModel(Model):
 	def __init__(self, feature_extractor, initial_weights = None):
@@ -93,17 +100,8 @@ class StatePairLinearModel(LinearModel):
 			return np.dot(self.weights, self.feature_extractor(state, next_state))
 
 	def update(self, state, next_state, delta):
-		assert(state.current_player.name == next_state.current_player.name)
-	
+		super().update(state, next_state, delta)
 		phi = self.feature_extractor(state, next_state)
-		print("curplay", state.current_player.name, \
-				"health", state.current_player.hero.health, \
-				"my_next_health", next_state.current_player.hero.health, \
-				"enemy_health", state.current_player.opponent.hero.health, \
-				"enemy_next_heatlh", next_state.current_player.opponent.hero.health, \
-				"delta", delta)
-		# print(phi)
-
 		self.weights += delta * phi
 		# self.feature_extractor.debug(self.weights)
 	
@@ -120,20 +118,16 @@ class FinalStateLinearModel(LinearModel):
 
 	def train(self, dataset):
 		clf = linear_model.LinearRegression()
-		X = [self.feature_extractor(state) for state, value in dataset]
-		y = [value for state, value in dataset]
+		X, y = dataset
+		# X = [self.feature_extractor(state) for state, value in dataset]
+		# y = [value for state, value in dataset]
 		clf.fit(X, y)
 		self.weights = clf.coef_
 		# print(self.weights)
 
 	def update(self, state, next_state, delta):
+		super().update(state, next_state, delta)
 		phi = self.feature_extractor(next_state)
-		print("curplay", state.current_player.name, \
-				"health", state.current_player.hero.health, \
-				"my_next_health", next_state.current_player.hero.health, \
-				"enemy_health", state.current_player.opponent.hero.health, \
-				"enemy_next_heatlh", next_state.current_player.opponent.hero.health, \
-				"delta", delta)
 		self.weights += delta * phi
 
 class StateDifferenceLinearModel(LinearModel):
@@ -145,14 +139,9 @@ class StateDifferenceLinearModel(LinearModel):
 		return np.dot(self.weights, self.feature_extractor(next_state) - self.feature_extractor(state))
 
 	def update(self, state, next_state, delta):
+		super().update(state, next_state, delta)
 		phi = self.feature_extractor(state)
 		next_phi = self.feature_extractor(next_state)
-		print("curplay", state.current_player.name, \
-				"health", state.current_player.hero.health, \
-				"my_next_health", next_state.current_player.hero.health, \
-				"enemy_health", state.current_player.opponent.hero.health, \
-				"enemy_next_heatlh", next_state.current_player.opponent.hero.health, \
-				"delta", delta)
 		# self.feature_extractor.debug(next_phi - phi)
 		self.weights += delta * (next_phi - phi)
 		self.feature_extractor.debug(self.weights)
@@ -172,3 +161,68 @@ class BasicHeuristicModel(Model):
 			return score
 
 		return score(state_2.current_player) - score(state_2.other_player)
+
+class FinalStateNeuralModel(Model):
+	def __init__(self, feature_extractor, nn = None):
+		self.feature_extractor = feature_extractor
+		self.nn = nn if nn is not None else self.get_initial()
+		# self.train()
+
+	def get_initial(self):
+		return Regressor(
+				layers=[
+					Layer("Rectifier", units=100),
+					# Layer("Sigmoid", units = 200),
+					# Layer("Tanh", units = 100)
+					Layer("Linear")],
+				learning_rate=0.001,
+				n_iter=10,
+				f_stable = 0.1)
+
+	def eval(self, state, next_state):
+		if next_state.current_player_win(): return 1e9
+		if next_state.current_player_lose(): return -1e9
+		vec = np.array(self.feature_extractor(next_state))
+		return self.nn.predict(np.ndarray(shape = (1, len(vec)), buffer = vec))
+		# return np.dot(self.weights, self.feature_extractor(next_state))
+
+	def train(self, dataset):
+		X, y = dataset
+		# X = np.array([self.feature_extractor(state) for state, value in dataset])
+		# y = [value for state, value in dataset]
+		self.nn.fit(X, y)
+
+	# def train(self):
+		# Data = open("data.txt", "r")
+		# Tmp = Data.read().splitlines()
+		# training_set = []
+		# for i in Tmp:
+			# c = i.split(" ")
+			# for j in range(0, len(c)):
+				# c[j] = float(c[j])
+			# training_set.append(c)
+		# X = []
+		# y = []
+		# for data_point in training_set:
+			# X.append(data_point[0:-1])
+			# y.append(data_point[-1])
+		# for i in X:
+			# if (len(i) != 38):
+				# print(i)
+		# X = np.ndarray(shape = (len(y), len(X[0])), buffer = np.array(X))
+		# y = np.ndarray(shape = (len(y), 1), buffer = np.array(y))
+		# self.nn.fit(X, y)
+		# print("Learning from data size: " + str(len(y)))
+		# Data.close()
+
+class DeepNeuralModel(FinalStateNeuralModel):
+	def get_initial(self):
+		return Regressor(
+				layers=[
+					Layer("Rectifier", units=100),
+					Layer("Sigmoid", units = 200),
+					Layer("Tanh", units = 100),
+					Layer("Linear")],
+				learning_rate=0.001,
+				n_iter=10,
+				f_stable = 0.1)
