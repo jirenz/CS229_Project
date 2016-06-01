@@ -51,7 +51,7 @@ class StrategyAgent(DoNothingAgent):
 		manager = ActionTreeManager()
 		manager.encounter(game)
 		# manager.think_depth(self.max_depth)
-		manager.think_2(self.model, self.max_depth)
+		manager.think_2(self.model, depth = self.max_depth)
 		# manager.think_1(function_approximator = self.function_approximator)
 		return manager.find_best_action(self.model)
 

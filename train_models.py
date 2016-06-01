@@ -54,11 +54,11 @@ if __name__ == "__main__":
 
 	# ResourceExtractor
 
-	# experience_replay_train( \
-		# model = StateDifferenceLinearModel(ResourceExtractor()),
-		# epochs = int(sys.argv[1]), \
-		# eta = 0.0005, \
-		# save_file = "ql_sd_resource")
+	experience_replay_train( \
+		model = StateDifferenceLinearModel(ResourceExtractor()),
+		epochs = int(sys.argv[1]), \
+		eta = 0.0005, \
+		save_file = "ql_sd_resource")
 
 	# nice try, but no
 	# with open("ql_sd_resource", "rb") as f:

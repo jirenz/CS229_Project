@@ -96,7 +96,7 @@ if __name__ == "__main__":
 	# train_models.py ql_sd_resource 20 1
 	# train_models.py ql_sd_resource 20 2
 
-	# Nice
+	# Nice(bbert) Pretty nice(jiren)
 	# train_models.py st_fs_resource 20 1
 	# train_models.py st_fs_resource 20 2
 	
