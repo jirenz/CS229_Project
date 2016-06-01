@@ -37,7 +37,7 @@ class ActionTreeNode():
             if new_value > max_value:
                 max_value = new_value
                 max_action = child.action
-        print("Max value: " + str(max_value))
+        #print("Max value: " + str(max_value))
         return max_action
 
     def eval(self, function_approximator):
