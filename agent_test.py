@@ -38,7 +38,7 @@ def test_agent_once(one, other = None):
 	new_game = game.copy()
 	try:
 		history = new_game.start_with_history()
-		new_data = GameHistoryGenerator.process_history(history, game)
+		new_data = GameHistoryGenerator.process_history(history, new_game)
 		Data = open("data.txt", "a")
 		for i in new_data:
 			tmp = i[0]
