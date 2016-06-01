@@ -217,10 +217,7 @@ class SimpleExtractor(StateFeatureExtractor):
 	def debug(self, weights):
 		print(weights)
 
-class PearExtractor(StateFeatureExtractor):
-	def __init__(self):
-		pass
-
+class PearExtractor():		
 	def __call__(self, game):
 		player = game.current_player
 		oppo = player.opponent
@@ -248,10 +245,10 @@ class PearExtractor(StateFeatureExtractor):
 		for i in range(0, 7 - count): feat += [0, 0, 0]
 		feat += [oppo.hero.health, oppo.hero.armor]
 
-		return np.array(feat)
+		return feat
 
-	def debug(self, weights):
-		print(weights)
+	#def debug(self, weights):
+	#	print(weights)
 
 	# this is now saved in linear_pear_extractor_model, no need for the hack
 	# def get_initial(self):

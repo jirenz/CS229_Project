@@ -16,8 +16,9 @@ from projectfiles.hearthlogger import Hearthlogger
 from projectfiles.agent import *
 from projectfiles.feature_extract import *
 from projectfiles.strategy_agent import *
-
+from projectfiles.game_history_generator import *
 from learning.model import *
+from learning.function_approximator import *
 
 import numpy as np
 import pickle
@@ -35,15 +36,23 @@ def test_agent_once(one, other = None):
 		#other = RandomAgent()
 	game = Game([deck1, deck2], [one, other])
 	new_game = game.copy()
-	try:
-		new_game.start()
-	except Exception as e:
-		print("Game error: " + str(e))
-		raise e
-		# raise
-		#print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
-		# new_game
-		return False
+	#try:
+	for aaaaa in range(1):
+		history = new_game.start_with_history()
+		new_data = GameHistoryGenerator.process_history(history, game)
+		Data = open("data.txt", "a")
+		for i in new_data:
+			tmp = i[0]
+			tmp.append(i[1])
+			for j in range(len(tmp)):
+				tmp[j] = str(tmp[j])
+			Data.write(" ".join(tmp))
+			Data.write("\n")
+		Data.close()			
+	#except Exception as e:
+	#	print("Game error: " + str(e))
+		#raise e
+	#	return False
 	print("Game lasted: " + str(new_game._turns_passed))
 	print("winning agent: " + new_game.winner.agent.name)
 	# spark_weights(ql.weights)
@@ -115,12 +124,15 @@ if __name__ == "__main__":
 	# StateDifference models converge beautifully while training, but don't work?
 	# Why? Are we using them wrong in StrategyAgent or are they just really terrible?
 
-	model_name = sys.argv[1]
-	if model_name == "heuristic":
-		model = BasicHeuristicModel()
-	else:
-		with open(model_name, "rb") as f:
-			model = pickle.load(f)
+	#model_name = sys.argv[1]
+	#if model_name == "heuristic":
+	#	model = BasicHeuristicModel()
+	#else:
+	#	with open(model_name, "rb") as f:
+	#		model = pickle.load(f)
+	model = LinearFunctionApproximator()
+	model_name = "Function_approximator"
+	max_depth = 0
 
 	try:
 		spark_weights(model.weights)
@@ -132,7 +144,6 @@ if __name__ == "__main__":
 	except:
 		pass
 	
-	num_games = int(sys.argv[2])
-	max_depth = int(sys.argv[3])
-	run_agent(StrategyAgent(model, model_name, max_depth), TradeAgent(), num_games)
+	num_games = int(sys.argv[1])
+	run_agent(StrategyAgent(model, model_name), TradeAgent(), num_games)
 

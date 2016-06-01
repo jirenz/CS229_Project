@@ -40,7 +40,7 @@ class ActionTreeNode():
 
     def find_best_action(self, function_approximator):
         max_action = GameHelper.NO_ACTION
-        max_value = function_approximator(original_state, self.game)
+        max_value = function_approximator(self.game)
         for child in self.children:
             new_value = child.eval(function_approximator)
             if new_value > max_value:
@@ -118,7 +118,7 @@ class ActionTreeManager():
                     child.priority = self.depth_function(child.depth) - function_approximator(child.game)
                     q.put(child)
             else:
-                for best in node.select_best_child(self.root.game, function_approximator):
+                for best in node.select_best_child(function_approximator):
                     best.priority = self.depth_function(best.depth) - function_approximator(child.game)
                     q.put(best)
             i += 1

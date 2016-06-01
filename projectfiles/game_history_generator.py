@@ -7,22 +7,20 @@ from hearthbreaker.agents import *
 from projectfiles.random_deck_generator import RandomDeckGenerator
 from projectfiles.deck_loader import DeckLoader
 from projectfiles.hearthlogger import Hearthlogger
+from projectfiles.feature_extract import *
 
 class GameHistoryGenerator:
-    def __init__(self):
-        pass
+    #def generate(numgames, agent1 = TradeAgent(), agent2 = TradeAgent()):
+    #    i = 0
+    #    games = []
+    #    while i < numgames:
+    #        results = self.generate_one(agent1, agent2)
+    #        if not results is None:
+    #            games += results
+    #            i += 1
+    #    return games
 
-    def generate(self, numgames, agent1 = TradeAgent(), agent2 = TradeAgent()):
-        i = 0
-        games = []
-        while i < numgames:
-            results = self.generate_one(agent1, agent2)
-            if not results is None:
-                games += results
-                i += 1
-        return games
-
-    def generate_one(self, agent1, agent2):
+    def generate_one(agent1, agent2):
         generator = RandomDeckGenerator()
         deck1 = generator.generate()
         deck2 = deck1.copy()
@@ -35,8 +33,9 @@ class GameHistoryGenerator:
             return None
         return self.process_history(history)
 
-    def process_history(self, history):
+    def process_history(history, game):
         results = []
+        helper = PearExtractor()
         for historic_game in history:
             if game.winner is None:
                 base_reward = 30
@@ -46,5 +45,5 @@ class GameHistoryGenerator:
                 else: 
                     base_reward = -80
             value = base_reward * (0.9 ** (game._turns_passed - historic_game._turns_passed))
-            results.append([historic_game, value])
+            results.append([helper(historic_game), value])
         return results
