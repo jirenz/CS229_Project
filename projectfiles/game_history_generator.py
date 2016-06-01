@@ -33,6 +33,9 @@ class GameHistoryGenerator:
             return None
         if not game.game_ended:
             return None
+        return self.process_history(history)
+
+    def process_history(self, history):
         results = []
         for historic_game in history:
             if game.winner is None:
