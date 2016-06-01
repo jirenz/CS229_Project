@@ -16,7 +16,7 @@ from projectfiles.hearthlogger import Hearthlogger
 from projectfiles.agent import *
 from projectfiles.feature_extract import *
 from projectfiles.strategy_agent import *
-
+from projectfiles.game_history_generator import *
 from learning.model import *
 from learning.function_approximator import *
 
@@ -36,12 +36,23 @@ def test_agent_once(one, other = None):
 		#other = RandomAgent()
 	game = Game([deck1, deck2], [one, other])
 	new_game = game.copy()
-	try:
-		new_game.start()
-	except Exception as e:
-		print("Game error: " + str(e))
-		raise e
-		return False
+	#try:
+	for aaaaa in range(1):
+		history = new_game.start_with_history()
+		new_data = GameHistoryGenerator.process_history(history, game)
+		Data = open("data.txt", "a")
+		for i in new_data:
+			tmp = i[0]
+			tmp.append(i[1])
+			for j in range(len(tmp)):
+				tmp[j] = str(tmp[j])
+			Data.write(" ".join(tmp))
+			Data.write("\n")
+		Data.close()			
+	#except Exception as e:
+	#	print("Game error: " + str(e))
+		#raise e
+	#	return False
 	print("Game lasted: " + str(new_game._turns_passed))
 	print("winning agent: " + new_game.winner.agent.name)
 	# spark_weights(ql.weights)

@@ -51,11 +51,12 @@ class LinearFunctionApproximator(BasicFunctionApproximator):
 		#	self.weights = initial_weights
 
 	def __call__(self, state):
+		#print(len(self.extractor(state)), len(self.weights))
 		return np.dot(self.extractor(state), self.weights)
 
 	def eval(self, state):
 		if state.current_player_win(): return 100000000
-		if state.current_player_lose(): return -100000000
+		if state.current_player_lose(): return -10000000	
 		return np.dot(self.extractor(state), self.weights)
 
 	def train(self):
@@ -65,7 +66,7 @@ class LinearFunctionApproximator(BasicFunctionApproximator):
 		for i in Tmp:
 			c = i.split(" ")
 			for j in range(0, len(c)):
-				c[j] = int(c[j])
+				c[j] = float(c[j])
 			training_set.append(c)
 		clf = linear_model.LinearRegression()
 		X = []
@@ -74,7 +75,8 @@ class LinearFunctionApproximator(BasicFunctionApproximator):
 			X.append(data_point[0:-1])
 			y.append(data_point[-1])
 		clf.fit(X, y)
-		self.weights = clf.coef_[1:]
+		self.weights = clf.coef_
+		Data.close()
 
 # deprecated
 	def update(self, game, score, delta):
