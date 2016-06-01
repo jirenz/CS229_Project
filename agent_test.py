@@ -47,13 +47,14 @@ def test_agent_once(one, other = None):
 				tmp[j] = str(tmp[j])
 			Data.write(" ".join(tmp))
 			Data.write("\n")
-		Data.close()			
+		Data.close()
+		print("Game lasted: " + str(new_game._turns_passed))
+		print("winning agent: " + new_game.winner.agent.name)
 	except Exception as e:
 		print("Game error: " + str(e))
 		#raise e
 		return False
-	print("Game lasted: " + str(new_game._turns_passed))
-	print("winning agent: " + new_game.winner.agent.name)
+	
 	# spark_weights(ql.weights)
 	return new_game.winner.agent.name
 
@@ -131,12 +132,12 @@ if __name__ == "__main__":
 	#		model = pickle.load(f)
 	model = LinearFunctionApproximator()
 	model_name = "Function_approximator"
-	max_depth = 0
+	#max_depth = 0
 
-	try:
-		spark_weights(model.weights)
-	except:
-		pass
+	#try:
+	#	spark_weights(model.weights)
+	#except:
+	#	pass
 
 	#try:
 	#	model.feature_extractor.debug(model.weights)
@@ -144,5 +145,9 @@ if __name__ == "__main__":
 	#	pass
 	
 	num_games = int(sys.argv[1])
-	run_agent(StrategyAgent(model, model_name), TradeAgent(), num_games)
-	#run_agent(TradeAgent(), TradeAgent(), num_games)
+	#run_agent(StrategyAgent(model, model_name), TradeAgent(), num_games)
+	run_agent(RandomAgent(), RandomAgent(), num_games / 4)
+	run_agent(RandomAgent(), TradeAgent(), num_games / 4)
+	run_agent(TradeAgent(), RandomAgent(), num_games / 4)
+	run_agent(TradeAgent(), TradeAgent(), num_games / 4)
+	

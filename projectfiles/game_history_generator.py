@@ -38,12 +38,12 @@ class GameHistoryGenerator:
         helper = PearExtractor()
         for historic_game in history:
             if game.winner is None:
-                base_reward = 30
+                base_reward = 3
             else:
                 if historic_game.current_player.name == game.winner.name:
-                    base_reward = 100
+                    base_reward = 10
                 else: 
-                    base_reward = -80
-            value = base_reward * (0.9 ** (game._turns_passed - historic_game._turns_passed))
+                    base_reward = -8
+            value = base_reward * (0.7 ** (game._turns_passed - historic_game._turns_passed))
             results.append([helper(historic_game), value])
         return results

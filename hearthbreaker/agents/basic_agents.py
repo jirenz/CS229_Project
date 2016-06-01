@@ -90,6 +90,7 @@ class PredictableAgent(Agent):
 
 class RandomAgent(DoNothingAgent):
     def __init__(self):
+        self.name = 'RandomAgent'
         super().__init__()
 
     def do_card_check(self, cards):
