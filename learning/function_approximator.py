@@ -79,9 +79,6 @@ class LinearFunctionApproximator(BasicFunctionApproximator):
             # print(data_point[0:-1])
             X.append(data_point[0:-1])
             y.append(data_point[-1])
-        XT = np.array(X).reshape(len(X), len(X[0]))
-        y = np.array(y)# , len(y), 1)
-        print("X: " + str(len(XT)) + " Y: " + str(len(X)))
         clf.fit(XT, y)
         self.weights = clf.coef_
         Data.close()
