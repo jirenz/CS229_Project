@@ -36,8 +36,7 @@ def test_agent_once(one, other = None):
 		#other = RandomAgent()
 	game = Game([deck1, deck2], [one, other])
 	new_game = game.copy()
-	#try:
-	for aaaaa in range(1):
+	try:
 		history = new_game.start_with_history()
 		new_data = GameHistoryGenerator.process_history(history, game)
 		Data = open("data.txt", "a")
@@ -49,10 +48,10 @@ def test_agent_once(one, other = None):
 			Data.write(" ".join(tmp))
 			Data.write("\n")
 		Data.close()			
-	#except Exception as e:
-	#	print("Game error: " + str(e))
+	except Exception as e:
+		print("Game error: " + str(e))
 		#raise e
-	#	return False
+		return False
 	print("Game lasted: " + str(new_game._turns_passed))
 	print("winning agent: " + new_game.winner.agent.name)
 	# spark_weights(ql.weights)
@@ -139,11 +138,11 @@ if __name__ == "__main__":
 	except:
 		pass
 
-	try:
-		model.feature_extractor.debug(model.weights)
-	except:
-		pass
+	#try:
+	#	model.feature_extractor.debug(model.weights)
+	#except:
+	#	pass
 	
 	num_games = int(sys.argv[1])
 	run_agent(StrategyAgent(model, model_name), TradeAgent(), num_games)
-
+	#run_agent(TradeAgent(), TradeAgent(), num_games)
