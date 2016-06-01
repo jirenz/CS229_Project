@@ -2,17 +2,15 @@ from hearthbreaker.agents.basic_agents import *
 import collections
 from projectfiles.feature_extract import *
 from learning.strategy import *
-from learning.function_approximator import *
 import json
 from projectfiles.tree_manager import *
 
 class StrategyAgent(DoNothingAgent):
-	def __init__(self, function_approximator = None, name = 'StrategyAgent'): # eta, explore_prob, discount, feature_extractor, learn = True):
+	def __init__(self, model = None, name = 'StrategyAgent', max_depth = 2): # eta, explore_prob, discount, feature_extractor, learn = True):
 		super().__init__()
-		self.name = name;
-		if function_approximator is None:
-			function_approximator = BasicFunctionApproximator()
-		self.function_approximator = function_approximator		
+		self.name = name
+		self.model = model if model is not None else BasicHeuristicModel()
+		self.max_depth = max_depth
 
 	def do_card_check(self, cards):
 		return [True, True, True, True]
@@ -21,11 +19,10 @@ class StrategyAgent(DoNothingAgent):
 		self.player = player
 		game = player.game
 		while True:
-
 			self.action = self.decide(game)
 			GameHelper.execute(game, self.action)
-			#print("Me: " + str(player.hero.health) + " Him: " + str(game.other_player.hero.health))
 			if self.action == GameHelper.NO_ACTION:
+				print("Me: " + str(player.hero.health) + " Opponent: " + str(game.other_player.hero.health))
 				return
 
 	def choose_target(self, targets):
@@ -52,8 +49,11 @@ class StrategyAgent(DoNothingAgent):
 	def decide(self, game):
 		manager = ActionTreeManager()
 		manager.encounter(game)
-		manager.think_depth()
-		return manager.find_best_action(self.function_approximator)
+		# manager.think_depth(self.max_depth)
+		manager.think_2(self.model, depth = self.max_depth)
+		# manager.think_1(function_approximator = self.function_approximator)
+		return manager.find_best_action(self.model)
+
 		# max_value = -1000
 		# max_action = GameHelper.NO_ACTION
 		# actions = GameHelper.generate_actions(game)
@@ -65,4 +65,4 @@ class StrategyAgent(DoNothingAgent):
 		#		max_value = new_value
 		#		max_action = action
 		# print("BEST:", max_action, max_value)
-		return max_action
+		# return max_action

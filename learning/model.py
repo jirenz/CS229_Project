@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn import linear_model
 import learning.mdp
 
 from projectfiles.random_deck_generator import RandomDeckGenerator
@@ -54,7 +55,7 @@ class HearthstoneMDP(learning.mdp.MDP):
 		return {"win" : 10, "lose" : -10, "tie" : 0.1}[event]
 	
 	def getDiscount(self):
-		return 0.90 #?
+		return 0.9 #?
 
 class Model:
 	def __init__(self):
@@ -113,12 +114,27 @@ class FinalStateLinearModel(LinearModel):
 		assert(isinstance(self.feature_extractor, StateFeatureExtractor))
 
 	def eval(self, state, next_state):
+		if next_state.current_player_win(): return 1e9
+		if next_state.current_player_lose(): return -1e9
 		return np.dot(self.weights, self.feature_extractor(next_state))
+
+	def train(self, dataset):
+		clf = linear_model.LinearRegression()
+		X = [self.feature_extractor(state) for state, value in dataset]
+		y = [value for state, value in dataset]
+		clf.fit(X, y)
+		self.weights = clf.coef_
+		# print(self.weights)
 
 	def update(self, state, next_state, delta):
 		phi = self.feature_extractor(next_state)
+		print("curplay", state.current_player.name, \
+				"health", state.current_player.hero.health, \
+				"my_next_health", next_state.current_player.hero.health, \
+				"enemy_health", state.current_player.opponent.hero.health, \
+				"enemy_next_heatlh", next_state.current_player.opponent.hero.health, \
+				"delta", delta)
 		self.weights += delta * phi
-		# self.weights /= np.sqrt(np.dot(self.weights, self.weights)) + 1e-6
 
 class StateDifferenceLinearModel(LinearModel):
 	def __init__(self, feature_extractor, initial_weights = None):
@@ -140,3 +156,19 @@ class StateDifferenceLinearModel(LinearModel):
 		# self.feature_extractor.debug(next_phi - phi)
 		self.weights += delta * (next_phi - phi)
 		self.feature_extractor.debug(self.weights)
+
+class BasicHeuristicModel(Model):
+	def __init__(self):
+		super().__init__()
+		
+	def eval(self, state_1, state_2):
+		def score(player):
+			score = 0
+			for i in player.minions:
+				score += i.calculate_attack()
+				score += i.health
+			score += len(player.hand) * 2
+			score += player.hero.health + player.hero.armor
+			return score
+
+		return score(state_2.current_player) - score(state_2.other_player)

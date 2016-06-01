@@ -76,6 +76,12 @@ class Game(Bindable):
         self.save_history = False
         self.history = []
 
+    def current_player_win(self):
+        return self.game_ended and self.winner is self.current_player
+
+    def current_player_lose(self):
+        return self.game_ended and (not (self.winner is self.current_player))
+
     def random_draw(self, cards, requirement):
         filtered_cards = [card for card in filter(requirement, cards)]
         if len(filtered_cards) > 0:

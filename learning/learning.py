@@ -2,6 +2,9 @@ import random
 import json
 
 from projectfiles.util import spark_weights
+from learning.model import *
+
+from projectfiles.game_history_generator import *
 
 import numpy as np
 
@@ -23,11 +26,11 @@ class QLearningAlgorithm:
 
 	def epsilon_greedy(self, state):
 		if random.random() < self.explore_prob:
-			print("epsilon_greedy: get random action")
+			# print("epsilon_greedy: get random action")
 			# next_action = random.choice(self.mdp.getActions(state))
 			return self.mdp.getRandomAction(state)
 		else:
-			print("epsilon_greedy: get best action")
+			# print("epsilon_greedy: get best action")
 			return self.mdp.getBestAction(state, self.getQ)
 	
 	def simulate_game(self, callback):
@@ -36,7 +39,7 @@ class QLearningAlgorithm:
 		turns = 0
 		while not self.mdp.is_end_state(state):
 			state._start_turn()
-			print("simulate_game: turn", turns, "current player", state.current_player.name)
+			# print("simulate_game: turn", turns, "current player", state.current_player.name)
 			# print(state.current_player.hero.__to_json__())
 
 			action = self.epsilon_greedy(state)
@@ -108,7 +111,7 @@ class ExperienceReplayQ(QLearningAlgorithm):
 
 			# train on the current game
 			for r_state, action, reward in game_experience:
-				print("Replay", reward)
+				print("Epoch", epoch, "instant replay", "reward", reward)
 				next_state, _ = self.mdp.getSuccAndReward(r_state, action)
 				assert(r_state.current_player.name == next_state.current_player.name)
 				# print(r_state.current_player.name, action.current_player.name, next_state.current_player.name)
@@ -122,7 +125,7 @@ class ExperienceReplayQ(QLearningAlgorithm):
 				self.experience = random.sample(self.experience, self.experience_size)
 
 			for episode in range(self.replays_per_epoch):
-				print("Epoch", epoch, "episode", episode, reward)
+				print("Epoch", epoch, "experience replay", episode, "reward", reward)
 				r_state, action, reward = random.choice(self.experience)
 				next_state, _ = self.mdp.getSuccAndReward(r_state, action)
 				self.F.update(r_state, action, \
@@ -131,3 +134,15 @@ class ExperienceReplayQ(QLearningAlgorithm):
 
 			self.F.feature_extractor.debug(self.F.weights)
 
+class SupervisedLearningAlgorithm:
+	def __init__(self, model, agent1 = TradeAgent(), agent2 = TradeAgent()):
+		self.model = model
+		assert(isinstance(self.model, FinalStateLinearModel))
+		self.agent1 = agent1
+		self.agent2 = agent2
+
+	def train(self, epochs = 10):
+		generator = GameHistoryGenerator()
+
+		training_set = generator.generate(epochs)
+		self.model.train(training_set)

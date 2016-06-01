@@ -15,15 +15,10 @@ from projectfiles.deck_loader import DeckLoader
 from projectfiles.hearthlogger import Hearthlogger
 from projectfiles.agent import *
 from projectfiles.feature_extract import *
-from projectfiles.feature_extract_2 import *
-from learning.function_approximator import *
-
-# from sparklines import sparklines
-
-
 from projectfiles.strategy_agent import *
-from learning.function_approximator import *
+
 from learning.model import *
+from learning.function_approximator import *
 
 import numpy as np
 import pickle
@@ -44,11 +39,10 @@ def test_agent_once(one, other = None):
 	try:
 		new_game.start()
 	except Exception as e:
-	#	print("Game error: " + str(e))
-		#print(json.dumps(new_game.__to_json__(), default=lambda o: o.__to_json__(), indent=1))
-		del new_game
-		#raise
+		print("Game error: " + str(e))
+		raise e
 		return False
+	print("Game lasted: " + str(new_game._turns_passed))
 	print("winning agent: " + new_game.winner.agent.name)
 	# spark_weights(ql.weights)
 	return new_game.winner.agent.name
@@ -75,15 +69,70 @@ def run_agent(one, other, number):
 
 
 if __name__ == "__main__":
-	# ql = AIAgent(eta = 0.001, explore_prob = 0.1, discount = 0.5, feature_extractor = feature_extractor_2)
-	# run_agent(ql, ql, int(sys.argv[1]))
+	# OLD STUFF
+		# ql = AIAgent(eta = 0.001, explore_prob = 0.1, discount = 0.5, feature_extractor = feature_extractor_2)
+		# run_agent(ql, ql, int(sys.argv[1]))
 
-	# ql.explore_prob = 0.0
-	# ql.learn = False
-	# run_agent(ql, None, int(sys.argv[2]))
-	approximator1 = LinearFunctionApproximator()
-	approximator2 = BasicFunctionApproximator()
-	#print("Training")
-	#approximator.train(int(sys.argv[1]))
-	print("Testing")
-	run_agent(StrategyAgent(approximator1, 'Linear'), TradeAgent(), int(sys.argv[2]))
+		# ql.explore_prob = 0.0
+		# ql.learn = False
+		# run_agent(ql, None, int(sys.argv[2]))
+		# approximator1 = LinearFunctionApproximator()
+		# approximator2 = BasicFunctionApproximator()
+
+		#print("Training")
+		#approximator.train(int(sys.argv[1]))
+
+	# Nice
+	# train_models.py ql_sp_relative 20 1
+	# train_models.py ql_sp_relative 20 2
+
+	# Nice
+	# train_models.py ql_fs_resource 20 1
+	# train_models.py ql_fs_resource 20 2
+
+	# nah
+	# train_models.py ql_sd_resource 20 1
+	# train_models.py ql_sd_resource 20 2
+
+	# Nice(bbert) Pretty nice(jiren)
+	# train_models.py st_fs_resource 20 1
+	# train_models.py st_fs_resource 20 2
+	
+	# Ok
+	# train_models.py ql_fs_pear 20 1
+	# train_models.py ql_fs_pear 20 2
+
+	# nah
+	# train_models.py ql_sd_pear 20 1
+	# train_models.py ql_sd_pear 20 2
+
+	# Nice
+	# train_models.py st_fs_pear 20 1
+	# train_models.py st_fs_pear 20 2
+
+	# StateDifference models converge beautifully while training, but don't work?
+	# Why? Are we using them wrong in StrategyAgent or are they just really terrible?
+
+	#model_name = sys.argv[1]
+	#if model_name == "heuristic":
+	#	model = BasicHeuristicModel()
+	#else:
+	#	with open(model_name, "rb") as f:
+	#		model = pickle.load(f)
+	model = LinearFunctionApproximator()
+	model_name = "Function_approximator"
+	max_depth = 0
+
+	try:
+		spark_weights(model.weights)
+	except:
+		pass
+
+	try:
+		model.feature_extractor.debug(model.weights)
+	except:
+		pass
+	
+	num_games = int(sys.argv[1])
+	run_agent(StrategyAgent(model, model_name), TradeAgent(), num_games)
+
