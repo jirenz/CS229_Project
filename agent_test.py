@@ -23,7 +23,7 @@ from learning.function_approximator import *
 import numpy as np
 import pickle
 
-from projectfiles.util import spark_weights
+#from projectfiles.util import spark_weights
 
 def test_agent_once(one, other = None):
 	#print("game_started")
