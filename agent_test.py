@@ -130,8 +130,9 @@ if __name__ == "__main__":
 	#else:
 	#	with open(model_name, "rb") as f:
 	#		model = pickle.load(f)
-	model = LinearFunctionApproximator()
-	model_name = "Function_approximator"
+	if (sys.argv[2] == "-t"):
+		model = LinearFunctionApproximator()
+		model_name = "Function_approximator"
 	#max_depth = 0
 
 	#try:
@@ -145,9 +146,12 @@ if __name__ == "__main__":
 	#	pass
 	
 	num_games = int(sys.argv[1])
-	#run_agent(StrategyAgent(model, model_name), TradeAgent(), num_games)
-	run_agent(RandomAgent(), RandomAgent(), num_games / 4)
-	run_agent(RandomAgent(), TradeAgent(), num_games / 4)
-	run_agent(TradeAgent(), RandomAgent(), num_games / 4)
-	run_agent(TradeAgent(), TradeAgent(), num_games / 4)
+	if (sys.argv[2] == "-t"):
+		run_agent(StrategyAgent(model, model_name), TradeAgent(), num_games)
+	else:
+		run_agent(TradeAgent(), RandomAgent(), num_games / 4)
+		run_agent(TradeAgent(), TradeAgent(), num_games / 4)
+		run_agent(RandomAgent(), RandomAgent(), num_games / 4)
+		run_agent(RandomAgent(), TradeAgent(), num_games / 4)
+		
 	

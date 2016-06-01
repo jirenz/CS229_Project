@@ -231,7 +231,7 @@ class PearExtractor():
 			count += 1
 		tmp.sort()
 		for i in tmp: feat += i
-		for i in range(0, 7 - count): feat += [0, 0]
+		for i in range(0, 8 - count): feat += [0, 0]
 		feat += [(player.hero.health + player.hero.armor) / 5]
 		feat += [len(player.deck.cards) / 5, len(player.hand) / 2]
 		
@@ -243,7 +243,7 @@ class PearExtractor():
 			count += 1
 		tmp.sort()
 		for i in tmp: feat += i
-		for i in range(0, 7 - count): feat += [0, 0]
+		for i in range(0, 8 - count): feat += [0, 0]
 		feat += [(oppo.hero.health + oppo.hero.armor) / 5]
 		feat += [len(oppo.deck.cards) / 5, len(oppo.hand) / 2]
 

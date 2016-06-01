@@ -6,8 +6,11 @@ import random
 from projectfiles.game_history_generator import *
 from sklearn import linear_model
 # from projectfiles.pear_extractor import *
-
+import numpy
+import sys
 #print("function_approximator.py is deprecated")
+
+sys.setrecursionlimit(300)
 
 class BasicFunctionApproximator:
 	def __init__(self):
@@ -46,9 +49,9 @@ class LinearFunctionApproximator(BasicFunctionApproximator):
 		self.extractor = PearExtractor()
 		self.train()
 		#if initial_weights is None:
-		#	self.weights = self.extractor.get_initial()
+		#   self.weights = self.extractor.get_initial()
 		#else:
-		#	self.weights = initial_weights
+		#   self.weights = initial_weights
 
 	def __call__(self, state):
 		#print(len(self.extractor(state)), len(self.weights))
@@ -74,6 +77,9 @@ class LinearFunctionApproximator(BasicFunctionApproximator):
 		for data_point in training_set:
 			X.append(data_point[0:-1])
 			y.append(data_point[-1])
+		for i in X:
+			if (len(i) != 38):
+				print(i)
 		clf.fit(X, y)
 		self.weights = clf.coef_
 		Data.close()
