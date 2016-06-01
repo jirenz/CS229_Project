@@ -7,6 +7,7 @@ from learning.model import *
 from projectfiles.game_history_generator import *
 
 import numpy as np
+import pickle
 
 class QLearningAlgorithm:
 	def __init__(self, mdp, eta, explore_prob, function_approximator):
@@ -133,16 +134,3 @@ class ExperienceReplayQ(QLearningAlgorithm):
 				spark_weights(self.F.weights)
 
 			self.F.feature_extractor.debug(self.F.weights)
-
-class SupervisedLearningAlgorithm:
-	def __init__(self, model, agent1 = TradeAgent(), agent2 = TradeAgent()):
-		self.model = model
-		assert(isinstance(self.model, FinalStateLinearModel))
-		self.agent1 = agent1
-		self.agent2 = agent2
-
-	def train(self, epochs = 10):
-		generator = GameHistoryGenerator()
-
-		training_set = generator.generate(epochs)
-		self.model.train(training_set)
