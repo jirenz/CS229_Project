@@ -5,7 +5,14 @@ Generating data
 
 First, generate data for the supervised learning:
 
-	python3 generate_data.py 10 supervised_data
+	python3 generate_data.py 10 (dump into data.hsdat)
+	python3 generate_data.py 10 supervised_data  (dump into supervised_data)
+
+	python3 how_many_points.py [optional database name]
+	$ There are 382 data points.
+
+Note: now we can all generate into data.hsdat, this is pushed onto git so we share our database
+I changed the generate_data.py to reflect the change
 
 Then we can sample some data from that (especially for plotting k-fold estimates of learning curves)
 For example, to get 5 points out of the 10, a few times

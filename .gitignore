@@ -1,6 +1,9 @@
 # hslog file
 *.hslog
 
+# datasample file
+*.hssample
+
 *.pyc
 .project
 .pydevproject

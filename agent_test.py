@@ -25,7 +25,6 @@ import pickle
 
 from projectfiles.util import spark_weights
 
-import sys
 sys.setrecursionlimit(300)
 
 from collections import *
@@ -42,7 +41,7 @@ def test_agent_once(one, other = None):
 	game = Game([deck1, deck2], [one, other])
 	new_game = game.copy()
 	try:
-		history = new_game.start_with_history()
+		new_game.start()
 		# new_data = GameHistoryGenerator.process_history(history, new_game)
 		# Data = open("data.txt", "a")
 		# for i in new_data:
@@ -86,9 +85,22 @@ def run_agent(one, other, number):
 
 if __name__ == "__main__":
 	model_name = sys.argv[1]
-	oppo = sys.argv[2]
-	num_games = int(sys.argv[3])
-	max_depth = int(sys.argv[4])
+	
+	if len(sys.argv) >= 3:
+		oppo = sys.argv[2]
+	else:
+		oppo = "trade"
+	
+	if len(sys.argv) >= 4:
+		num_games = int(sys.argv[3])
+	else:
+		num_games = 20
+
+	if len(sys.argv) >= 5:
+		max_depth = int(sys.argv[4])
+	else:
+		max_depth = 2
+
 	if model_name == "heuristic":
 		model = BasicHeuristicModel()
 	else:
