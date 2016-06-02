@@ -1,0 +1,5 @@
+#!/bin/bash
+for ((;;)) do
+python3 generate_data.py 10
+done
+

@@ -4,8 +4,6 @@ import random
 import sys
 import json
 
-from sparklines import sparklines
-
 def spark_weights(weights):
 	W = weights - np.min(weights)
 	W = W * 30 / (np.max(W) + 1e-6)
