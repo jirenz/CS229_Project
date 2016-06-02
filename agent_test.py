@@ -25,6 +25,10 @@ import pickle
 
 #from projectfiles.util import spark_weights
 
+import sys
+sys.setrecursionlimit(300)
+
+
 def test_agent_once(one, other = None):
 	#print("game_started")
 	generator = RandomDeckGenerator()
@@ -130,9 +134,15 @@ if __name__ == "__main__":
 	#else:
 	#	with open(model_name, "rb") as f:
 	#		model = pickle.load(f)
-	if (sys.argv[2] == "-t"):
+	if (sys.argv[2] == "-l"):
 		model = LinearFunctionApproximator()
-		model_name = "Function_approximator"
+		model_name = "Linear"
+	if (sys.argv[2] == "-n"):
+		model = BasicNeuroApproximator()
+		model_name = "Neuro"
+	if (sys.argv[2] == "-d"):
+		model = DeepNeuroApproximator()
+		model_name = "Deep Neuro"
 	#max_depth = 0
 
 	#try:
@@ -146,7 +156,7 @@ if __name__ == "__main__":
 	#	pass
 	
 	num_games = int(sys.argv[1])
-	if (sys.argv[2] == "-t"):
+	if (sys.argv[2] == "-l" or sys.argv[2] == "-n" or sys.argv[2] == "-d"):
 		run_agent(StrategyAgent(model, model_name), TradeAgent(), num_games)
 	else:
 		run_agent(TradeAgent(), RandomAgent(), num_games / 4)
