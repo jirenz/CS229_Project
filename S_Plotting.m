@@ -44,6 +44,10 @@ plot(YL,'-s',...
 set(gca, 'XTick', 1:length(X))
 set(gca,'XTickLabel', X)
 set(gca, 'YGrid', 'on')
+pos = get(gcf, 'Position'); %// gives x left, y bottom, width, height
+width = pos(3);
+height = pos(4);
+set(gcf, 'Position', [100, 80, width, height * 0.8])
 title('Learning curve of supervised learner')
 xlabel('Training set data size')
 ylabel('Winning rate')

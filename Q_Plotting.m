@@ -41,9 +41,15 @@ plot(XQ2,'-s',...
 %plot(XQ, XQ1, 'color', [1, 0, 1], 'LineWidth',3)
 %plot(XQ, XQ2, 'color', [0, 1, 1], 'LineWidth',3)
 %plot(YQ, 'color', [0, 0, 1])
+set(gca, 'ylim', [30, 70])
 set(gca, 'XTick', 1:length(XQ))
 set(gca,'XTickLabel', XQ)
 set(gca, 'YGrid', 'on')
+pos = get(gcf, 'Position'); %// gives x left, y bottom, width, height
+width = pos(3);
+height = pos(4);
+set(gcf, 'Position', [100, 80, width, height * 0.8])
+
 title('Learning curve of q-learner')
 xlabel('Training epochs')
 ylabel('Winning rate')
