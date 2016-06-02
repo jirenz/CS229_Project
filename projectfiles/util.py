@@ -3,6 +3,7 @@ from hearthbreaker.agents.basic_agents import *
 import random
 import sys
 import json
+from sparklines import *
 
 def spark_weights(weights):
 	W = weights - np.min(weights)

@@ -14,14 +14,17 @@ def experience_replay_train(model, epochs = 10, eta = 0.001, save_file = None):
 	full_stage_strategy = StrategyManager()
 	training_mdp = HearthstoneMDP(full_stage_strategy)
 
-	ql = ExperienceReplayQ(mdp = training_mdp,
+	try:
+		ql = ExperienceReplayQ(mdp = training_mdp,
 			eta = eta, 
 			explore_prob = 0.2,
 			function_approximator = model,
 			experience_size = 100,
 			replays_per_epoch = 50)
 
-	ql.train(epochs)
+		ql.train(epochs)
+	except:
+		print("WA!")
 
 	try:
 		model.feature_extractor.debug(model.weights)
