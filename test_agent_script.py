@@ -6,8 +6,8 @@ if __name__ == "__main__":
 	num_games = 100
 	max_depth = 2
 	oppo = "trade"
-	for size in [500, 1000, 2000]:# 4000, 8000, 12000, 16000, 20000, 25000, 30000, 40000]:
-		for model_name in ["st_fs_neural", "st_fs_deep_neural"]: #"st_fs_resource", 
+	for size in [2000]:# 20000, 8000, 40000, 16000, 12000, 25000, 30000, 40000]:
+		for model_name in ["st_fs_resource", "st_fs_deep_neural"]: # "st_fs_neural", ""]: #"", 
 			model_name = "models/" + model_name + "_" + str(size) + ".t"
 			with open(model_name, "rb") as f:
 				model = pickle.load(f)
