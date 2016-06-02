@@ -9,8 +9,8 @@ YL = [1, 5, 9, 59, 52, 62, 78, 69, 81, 76, 77]
 1, 5, 10, 20, 50 
 20, 100, 200, 400, 1000
 XQ = [2,3.4,4,4.8,6]
-XQ1 = [41, 60, 64, 65, 40]
-XQ2 = [52, 49, 50, 59, 50]
+%XQ1 = [41, 60, 64, 65, 40]
+%XQ2 = [52, 49, 50, 59, 50]
 %YQ = [0, 62, 50, 0, 55]
 %models/ql_sp_relative_50.t trade 100 2 => 50
 %models/ql_sp_relative_20.t trade 100 2 => 62
@@ -24,15 +24,27 @@ XQ2 = [52, 49, 50, 59, 50]
 %models/ql_fs_resource_20.t trade 100 2 => 65
 %models/ql_fs_resource_50_2.t trade 100 2 => 40
 
+figure
 hold on
-plot(YD, 'color', [1, 0, 0], 'LineWidth',3)
-plot(YL, 'color', [0, 1, 0], 'LineWidth',3)
-plot(XQ, XQ1, 'color', [1, 0, 1], 'LineWidth',3)
-plot(XQ, XQ2, 'color', [0, 1, 1], 'LineWidth',3)
+plot(YD,'-s',...
+     'color', [1, 0, 0],...
+    'LineWidth',3,...
+    'MarkerSize',13,...
+    'MarkerEdgeColor',[1, 0, 0],...
+    'MarkerFaceColor',[1,0,0])
+plot(YL,'-s',...
+     'color', [0, 0, 1],...
+    'LineWidth',3,...
+    'MarkerSize',13,...
+    'MarkerEdgeColor',[0, 0, 1],...
+    'MarkerFaceColor',[0,0,1])
+%plot(XQ, XQ1, 'color', [1, 0, 1], 'LineWidth',3)
+%plot(XQ, XQ2, 'color', [0, 1, 1], 'LineWidth',3)
 %plot(YQ, 'color', [0, 0, 1])
 set(gca, 'XTick', 1:length(X))
 set(gca,'XTickLabel', X)
-%
+set(gca, 'YGrid', 'on')
+title('Learning curve of supervised learner')
 xlabel('Training set data size')
 ylabel('Winning rate')
 rez=1200; %resolution (dpi) of final graphic
