@@ -23,7 +23,8 @@ def experience_replay_train(model, epochs = 10, eta = 0.001, save_file = None):
 			replays_per_epoch = 50)
 
 		ql.train(epochs)
-	except:
+	except Exception as e:
+		raise e
 		print("WA!")
 
 	try:

@@ -53,7 +53,7 @@ class HearthstoneMDP(learning.mdp.MDP):
 		return (next_state, reward)
 
 	def getReward(self, event):
-		return {"win" : 10, "lose" : -8, "tie" : 31}[event]
+		return {"win" : 10, "lose" : -8, "tie" : 3}[event]
 	
 	def getDiscount(self):
 		return 0.8
@@ -112,8 +112,8 @@ class FinalStateLinearModel(LinearModel):
 		assert(isinstance(self.feature_extractor, StateFeatureExtractor))
 
 	def eval(self, state, next_state):
-		if next_state.current_player_win(): return 1e9
-		if next_state.current_player_lose(): return -1e9
+		# if next_state.current_player_win(): return 1e9
+		# if next_state.current_player_lose(): return -1e9
 		return np.dot(self.weights, self.feature_extractor(next_state))
 
 	def train(self, dataset):
@@ -129,6 +129,7 @@ class FinalStateLinearModel(LinearModel):
 		super().update(state, next_state, delta)
 		phi = self.feature_extractor(next_state)
 		self.weights += delta * phi
+		# self.feature_extractor.debug(weights)
 
 class StateDifferenceLinearModel(LinearModel):
 	def __init__(self, feature_extractor, initial_weights = None):
