@@ -27,3 +27,4 @@ if __name__ == "__main__":
 		#	model = DeepNeuralModel(ResourceExtractor()), \
 		#	data_file = "samples/" + str(size) + ".hssample", \
 		#	save_file = "models/st_fs_deep_neural" + str(size) + ".t")
+
