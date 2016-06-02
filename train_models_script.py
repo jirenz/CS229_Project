@@ -2,7 +2,7 @@ from train_models import *
 
 if __name__ == "__main__":
 	print("Hi")
-	for size in [500]: #, 1000, 2000, 4000, 8000, 12000, 16000, 20000, 25000, 30000, 40000]:
+	for size in [500, 1000, 2000, 4000, 8000, 12000, 16000, 20000, 25000, 30000, 40000]:
 		experience_replay_train( \
 			model = StatePairLinearModel(RelativeResourceExtractor()), \
 			epochs = int(size/20), \

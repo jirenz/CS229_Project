@@ -35,14 +35,14 @@ sample: data.hsdat
 	python3.5 sample_data.py -d 500 #25
 	python3.5 sample_data.py -d 1000 #50
 	python3.5 sample_data.py -d 2000 #100
-	#python3.5 sample_data.py -d 4000 #200
-	#python3.5 sample_data.py -d 8000 #400
-	#python3.5 sample_data.py -d 12000 #
-	#python3.5 sample_data.py -d 16000
-	#python3.5 sample_data.py -d 20000
-	#python3.5 sample_data.py -d 25000
-	#python3.5 sample_data.py -d 30000
-	#python3.5 sample_data.py -d 40000
+	python3.5 sample_data.py -d 4000 #200
+	python3.5 sample_data.py -d 8000 #400
+	python3.5 sample_data.py -d 12000 #
+	python3.5 sample_data.py -d 16000
+	python3.5 sample_data.py -d 20000
+	python3.5 sample_data.py -d 25000
+	python3.5 sample_data.py -d 30000
+	python3.5 sample_data.py -d 40000
 
 
 clean:
