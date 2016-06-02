@@ -29,11 +29,11 @@ def experience_replay_train(model, epochs = 10, eta = 0.001, save_file = None):
 		pass
 
 	if save_file is not None:
-		with open(save_file, "wb") as f:
+		with open("models." + save_file, "wb+") as f:
 			pickle.dump(model, f)
 
 def supervised_train(model, data_file = None, save_file = None):
-	with open(data_file, "rb") as f:
+	with open("samples/" + data_file, "rb") as f:
 		training_set = pickle.load(f)
 
 	model.train(training_set)
@@ -44,7 +44,7 @@ def supervised_train(model, data_file = None, save_file = None):
 		pass
 
 	if save_file is not None:
-		with open(save_file, "wb") as f:
+		with open("models/" + save_file, "wb+") as f:
 			pickle.dump(model, f)
 
 if __name__ == "__main__":
@@ -65,7 +65,7 @@ if __name__ == "__main__":
 	elif model_name.find("st_fs_resource") != -1:
 		supervised_train( \
 			model = FinalStateLinearModel(ResourceExtractor()), \
-			epochs = int(sys.argv[2]), \
+			data_file = sys.argv[2], \
 			save_file = model_name)
 	elif model_name.find("st_fs_neural") != -1:
 		supervised_train( \

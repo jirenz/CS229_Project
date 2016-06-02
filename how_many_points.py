@@ -12,13 +12,15 @@ if __name__ == "__main__":
 
     with open(input_file, "rb") as f:
         X, y= pickle.load(f)
+        i = 2
         while 1:
             try:
                 X_in, y_in = pickle.load(f)
             except EOFError:
                 break
+            print("Iteration: " + str(i))
             X = np.concatenate((X, X_in))
             y = np.concatenate((y, y_in))
-
+            i += 1
     n = len(X)
     print("There are", n, "data points.")
