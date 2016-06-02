@@ -16,3 +16,5 @@ models/st_fs_deep_neural_50.t trade 100 2 => 67
 models/st_fs_deep_neural_10.t trade 100 2 => 2
 models/st_fs_deep_neural_1000.t trade 100 2 => 71
 models/st_fs_resource_1000.t trade 100 2 => 62
+ql_sp_relative_50.t trade 100 2 => 50
+models/ql_sp_relative_20.t trade 100 2 => 62
