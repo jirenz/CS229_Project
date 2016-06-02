@@ -1,0 +1,3 @@
+models/st_fs_deep_neural_40000.t trade 20 2 => 16
+models/st_fs_resource_500.t trade 20 2 => 13
+models/st_fs_resource_500.t trade 100 2 => 52

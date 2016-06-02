@@ -104,7 +104,7 @@ if __name__ == "__main__":
 	if model_name == "heuristic":
 		model = BasicHeuristicModel()
 	else:
-		with open("models/" + model_name, "rb") as f:
+		with open(model_name, "rb") as f:
 			model = pickle.load(f)
 	
 	our_agent = StrategyAgent(model, model_name, max_depth)
