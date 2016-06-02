@@ -61,7 +61,14 @@ class QLearningAlgorithm:
 			QLearningAlgorithm.spark_weights(self.F.weights)
 
 		for epoch in range(epochs):
-			self.simulate_game(qlearning_update)
+			done = False
+			while not done:
+				old_weights = self.F.weights
+				try:
+					self.simulate_game(qlearning_update)
+					done = True
+				except:
+					self.F.weights = old_weights
 
 class ExperienceReplayQ(QLearningAlgorithm):
 	def __init__(self, mdp, eta, explore_prob, function_approximator,
@@ -82,7 +89,14 @@ class ExperienceReplayQ(QLearningAlgorithm):
 				assert(state.current_player.name == action.current_player.name)
 				history.append((state.copy(), action.copy()))
 
-			state = self.simulate_game(save_history)
+			done = False
+			while not done:
+				try:
+					history = []
+					state = self.simulate_game(save_history)
+					done = True
+				except:
+					pass
 
 			# ... s1 a1 (p0), s2 a2 (p1), END : last action by p1, p1 either won or lost
 			# the last state tells you the winner. suppose p0 won, then we should get
