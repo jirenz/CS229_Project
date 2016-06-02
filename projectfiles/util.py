@@ -4,11 +4,11 @@ import random
 import sys
 import json
 
-#def spark_weights(weights):
-#	W = weights - np.min(weights)
-#	W = W * 30 / (np.max(W) + 1e-6)
-#	for line in sparklines(list(W), num_lines = 3):
-#		print(line)
+def spark_weights(weights):
+	W = weights - np.min(weights)
+	W = W * 30 / (np.max(W) + 1e-6)
+	for line in sparklines(list(W), num_lines = 3):
+		print(line)
 
 class FixedActionAgent(Agent):
 	def __init__(self, chosen_index, entity_index, target_index, minion_position_index = 0):

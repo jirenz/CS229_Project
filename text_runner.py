@@ -1,6 +1,7 @@
 import curses
 import curses.textpad
 import sys
+sys.setrecursionlimit(300)
 
 from hearthbreaker.agents import registry
 from hearthbreaker.cards.heroes import hero_for_class
