@@ -5,12 +5,12 @@
 clear
 X = [10, 20, 50, 200, 500, 1000, 2000, 4000, 12000, 20000, 40000]
 YD = [2, 50, 67, 81, 75, 71, 78, 73, 74, 75, 76]
-YL = [1, 5, 9, 0, 52, 62, 78, 69, 81, 76, 77]
+YL = [1, 5, 9, 59, 52, 62, 78, 69, 81, 76, 77]
 %XQ = [500]
 %YQ = [0, 62, 50, 0, 55]
 hold on
-plot(YD, 'color', [1, 0, 0])
-plot(YL, 'color', [0, 1, 0])
+plot(YD, 'color', [1, 0, 0], 'LineWidth',3)
+plot(YL, 'color', [0, 1, 0], 'LineWidth',3)
 %plot(YQ, 'color', [0, 0, 1])
 set(gca, 'XTick', 1:length(X))
 set(gca,'XTickLabel', X)
