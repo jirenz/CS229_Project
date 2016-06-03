@@ -1,6 +1,7 @@
 import curses
 import curses.textpad
 import sys
+import time
 sys.setrecursionlimit(300)
 
 from hearthbreaker.agents import registry
@@ -364,13 +365,24 @@ def render_game(stdscr):
 
             return options[selected]
 
+    def exit_word(window, string):
+        window.clear()
+        window.addstr(0, 0, string + " " + "Game is ending in 5 seconds.")
+        window.refresh()
+        time.sleep(5)
+        sys.exit()
+
+    def log(string):
+        with open("demo_log.txt", "a+") as f:
+            f.write(str(time.ctime()) + " " + string)
+
     stdscr.clear()
     prompt_window = stdscr.derwin(1, 80, 23, 0)
     text_window = stdscr.derwin(1, 80, 24, 0)
 
     generator = RandomDeckGenerator()
-    f = "models/st_fs_deep_neural_40000.t"
-    with open(f, "rb") as f:
+    path = "models/st_fs_deep_neural_40000.t"
+    with open(path, "rb") as f:
         model = pickle.load(f)
     agent = StrategyAgent(model, "AI", 3)
 
@@ -381,8 +393,21 @@ def render_game(stdscr):
         renderer = GameRender(stdscr, game, game.players[0])
     else:
         renderer = GameRender(stdscr, game, game.players[1])
-    game.start()
-
+    try:
+        game.start()
+    except Exception as e:
+        exit_word(text_window, "Sorry, an error occurred.")
+    if game.game_ended:
+        if not game.winner is None:
+            if game.winner.agent is agent:
+                log("AI win.")
+                exit_word(prompt_window, "You lost!")
+            else:
+                log("Human win.")
+                exit_word(prompt_window, "You won!")
+        else:
+            log("Draw.")
+            exit_word(prompt_window, "There is no winner!")
 
 if __name__ == "__main__":
     curses.wrapper(render_game)
