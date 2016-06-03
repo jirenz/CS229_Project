@@ -58,4 +58,4 @@ resolution=get(0,'ScreenPixelsPerInch'); %dont need to change anything here
 set(f,'paperunits','inches','papersize',figpos(3:4)/resolution,'paperposition',[0 0 figpos(3:4)/resolution]); %dont need to change anything here
 path=''; %the folder where you want to put the file
 name='Learning_curve_supervised.png'; %what you want the file to be called
-print(f,fullfile(path,name),'-dpng',['-r',num2str(rez)],'-opengl') %save file 
+print(f,fullfile(path,name),'-dpng',['-r',num2str(rez)],'-opengl') %save file
