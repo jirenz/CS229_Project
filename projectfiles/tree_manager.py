@@ -68,7 +68,7 @@ class ActionTreeNode():
         return best_child
 
 class ActionTreeManager():
-    def __init__(self, depth = 2, budget = 15):
+    def __init__(self, depth = 3, budget = 400):
         self.budget = budget
         self.depth = depth
         self.clear()
