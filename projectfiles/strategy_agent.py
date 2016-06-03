@@ -5,6 +5,8 @@ from learning.strategy import *
 import json
 from projectfiles.tree_manager import *
 
+from demo_debug import demo_log
+
 class StrategyAgent(DoNothingAgent):
 	def __init__(self, function_approximator = None, name = 'StrategyAgent', max_depth = 2): # eta, explore_prob, discount, feature_extractor, learn = True):
 		super().__init__()
@@ -23,11 +25,12 @@ class StrategyAgent(DoNothingAgent):
 			GameHelper.execute(game, self.action)
 
 			if self.action == GameHelper.NO_ACTION:
-				print("Me: " + str(player.hero.health) + " Opponent: " + str(game.other_player.hero.health))
+				# print("Me: " + str(player.hero.health) + " Opponent: " + str(game.other_player.hero.health))
+				demo_log("Me: " + str(player.hero.health) + " Opponent: " + str(game.other_player.hero.health))
 				return
 
 	def choose_target(self, targets):
-		print("Warning: Deciding target through Strategy Agent")
+		# print("Warning: Deciding target through Strategy Agent")
 		# raise Exception("asked to choose target")
 		if self.action[2] is not None and self.action[2] < len(targets):
 			return targets[self.action[2]]
@@ -36,7 +39,7 @@ class StrategyAgent(DoNothingAgent):
 		# return self.machine.choose_target(targets)
 
 	def choose_index(self, card, player):
-		print("Warning: Deciding index through Strategy Agent")
+		# print("Warning: Deciding index through Strategy Agent")
 		if self.action[1] is not None: 
 			return self.action[1]
 		else:
@@ -45,7 +48,7 @@ class StrategyAgent(DoNothingAgent):
 		# self.machine.choose_index(card, player)
 
 	def choose_option(self, options, player):
-		print("Warning: Deciding option through Strategy Agent")
+		# print("Warning: Deciding option through Strategy Agent")
 		# raise Exception("asked to choose option")
 		# options = self.filter_options(options, player)
 		return options[random.randint(0, len(options) - 1)]

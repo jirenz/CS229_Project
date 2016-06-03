@@ -384,7 +384,7 @@ def render_game(stdscr):
     path = "models/st_fs_deep_neural_40000.t"
     with open(path, "rb") as f:
         model = pickle.load(f)
-    agent = StrategyAgent(model, "AI", 3)
+    agent = StrategyAgent(model, "AI", 5)
 
     deck1 = generator.generate()
     deck2 = deck1.copy()

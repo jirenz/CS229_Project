@@ -4,6 +4,8 @@ import collections
 import queue
 from projectfiles.util import *
 
+from demo_debug import demo_log
+
 class ActionTreeNode():
     def __init__(self, game_state, state_set = None, parent = None, depth = 2, action = GameHelper.NO_ACTION): # , model = None):
         self.game = game_state
@@ -34,7 +36,8 @@ class ActionTreeNode():
                 self.state_set.add(new_game_hash)
                 self.children.append(ActionTreeNode(game_state = new_game, parent = self, action = action))
                 if new_game.current_player_win():
-                    print("Found Lethal")
+                    # print("Found Lethal")
+                    demo_log("Found lethal move.")
                     return True # found lethal, no need to proceed
         return False
 
@@ -47,6 +50,7 @@ class ActionTreeNode():
                 max_value = new_value
                 max_action = child.action
         # print("Max value: " + str(max_value))
+        demo_log("Best move: {} with value {}".format(max_action, max_value))
         return max_action
 
     def eval(self, initial_game, model):
